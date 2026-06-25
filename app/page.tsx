@@ -1,65 +1,110 @@
-import Image from "next/image";
+'use client';
+
+import { useAuth } from '@/lib/auth-context';
+import Link from 'next/link';
+import { Printer, QrCode, Upload, Shield, TrendingUp, Building2 } from 'lucide-react';
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-screen">
+      <header className="border-b border-border/50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <Printer className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight">QuickPrint</span>
+          </div>
+          <nav className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <Link href="/dashboard" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">Dashboard</Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2">Sign in</Link>
+                <Link href="/auth/register" className="text-sm font-medium bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors shadow-sm">Start your shop</Link>
+              </>
+            )}
+          </nav>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      </header>
+
+      <main className="flex-1">
+        <section className="py-24 md:py-36">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border text-sm text-muted-foreground mb-8">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Multi-tenant print shop platform
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
+              Smart print management
+              <span className="block text-primary">for modern shops</span>
+            </h1>
+            <p className="text-base sm:text-lg text-foreground/60 max-w-xl mx-auto mb-10 leading-relaxed">
+              The all-in-one platform for print shops, cyber cafés, and business centers.
+              Generate QR codes, accept uploads, manage queues, and process payments.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/auth/register" className="bg-primary text-white px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                Start your shop
+              </Link>
+              <Link href="/auth/login" className="border border-border bg-background px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+                Sign in
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 bg-muted/40 border-y border-border/50">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { icon: QrCode, title: 'QR Code Upload', desc: 'Customers scan a QR code to instantly upload documents from their phone. No app required.' },
+                { icon: Upload, title: 'Smart Queue', desc: 'Real-time print queue with live updates. Staff sees new orders the moment they come in.' },
+                { icon: Shield, title: 'Privacy First', desc: 'Documents are automatically deleted after 2 hours. Zero data retention. Fully GDPR-compliant.' },
+              ].map((f, i) => (
+                <div key={i} className="bg-card rounded-xl p-7 border shadow-sm">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <f.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-base font-semibold mb-1.5">{f.title}</h3>
+                  <p className="text-sm text-foreground/60 leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Built for African print shops</h2>
+              <p className="text-foreground/60 max-w-lg mx-auto">Everything you need to run a modern print business</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { icon: Building2, title: 'Multi-tenant', desc: 'Each shop gets its own branded portal with isolated data' },
+                { icon: TrendingUp, title: 'Analytics', desc: 'Track revenue, pages printed, and peak hours' },
+                { icon: Upload, title: 'M-Pesa ready', desc: 'Built-in mobile money and card payment support' },
+                { icon: Shield, title: 'Auto-deletion', desc: 'GDPR-compliant document handling with 2-hour retention' },
+              ].map((f, i) => (
+                <div key={i} className="bg-card rounded-xl p-6 border shadow-sm">
+                  <f.icon className="h-6 w-6 text-primary mb-3" />
+                  <h3 className="text-sm font-semibold mb-1">{f.title}</h3>
+                  <p className="text-xs text-foreground/60 leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t border-border/50 py-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center text-sm text-foreground/50">
+          &copy; 2026 QuickPrint. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }
