@@ -62,7 +62,7 @@ export default function RegisterPage() {
           );
         })}
         <button type="submit" disabled={loading}
-          className="w-full h-12 bg-[#003249] text-white rounded-xl text-sm font-medium hover:bg-[#003249]/90 transition-colors disabled:opacity-60 shadow-md shadow-[#003249]/20 inline-flex items-center justify-center gap-2">
+          className="w-full h-12 bg-ink text-white rounded-xl text-sm font-medium hover:bg-ink/90 transition-colors disabled:opacity-60 shadow-md shadow-[#003249]/20 inline-flex items-center justify-center gap-2">
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           {loading ? 'Creating account...' : 'Create account'}
         </button>

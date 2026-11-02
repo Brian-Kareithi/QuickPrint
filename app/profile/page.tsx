@@ -64,7 +64,7 @@ function ProfileContent() {
   return (
     <div className="max-w-2xl space-y-5">
       <div className="bg-card rounded-2xl border shadow-sm p-5 flex items-center gap-4">
-        <div className="h-14 w-14 rounded-full bg-[#003249] text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
+        <div className="h-14 w-14 rounded-full bg-ink text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0">

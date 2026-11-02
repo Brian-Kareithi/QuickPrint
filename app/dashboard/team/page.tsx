@@ -98,7 +98,7 @@ export default function TeamPage() {
       {created && (
         <div className="bg-green-50 border border-green-100 text-green-800 text-sm p-4 rounded-xl space-y-2">
           <p className="font-medium">Cashier added. Share these login details with them:</p>
-          <p className="font-mono text-xs bg-white/70 rounded-lg p-2.5">Email: {created.email}{created.password && <><br />Password: {created.password}</>}</p>
+          <p className="font-mono text-xs bg-card/70 rounded-lg p-2.5">Email: {created.email}{created.password && <><br />Password: {created.password}</>}</p>
           <Button size="sm" variant="outline" onClick={() => {
             navigator.clipboard?.writeText(`QuickPrint login\nEmail: ${created.email}\nPassword: ${created.password}`);
             setCopied(true); setTimeout(() => setCopied(false), 2000);

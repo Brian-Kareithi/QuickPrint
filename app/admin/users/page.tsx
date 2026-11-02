@@ -17,9 +17,9 @@ const ROLES = [
 ];
 const ROLE_LABEL: Record<string, string> = { ADMIN: 'Super admin', OWNER: 'Shop owner', STAFF: 'Cashier', CUSTOMER: 'Customer' };
 const ROLE_STYLE: Record<string, string> = {
-  ADMIN: 'bg-[#003249] text-white',
+  ADMIN: 'bg-ink text-white',
   OWNER: 'bg-primary/15 text-primary',
-  STAFF: 'bg-[#9ad1d4]/50 text-[#003249]',
+  STAFF: 'bg-[#9ad1d4]/50 text-foreground',
   CUSTOMER: 'bg-stone-200 text-stone-700',
 };
 
@@ -65,7 +65,7 @@ export default function AdminUsers() {
 
   const chip = (value: string, label: string) => (
     <button key={value} onClick={() => { setRole(value); setPage(1); }}
-      className={`px-3.5 py-1.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-all ${role === value ? 'bg-[#003249] text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
+      className={`px-3.5 py-1.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-all ${role === value ? 'bg-ink text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
       {label}
     </button>
   );
@@ -94,7 +94,7 @@ export default function AdminUsers() {
           return (
             <div key={u.id} className="p-4 border-b last:border-0 hover:bg-muted/25 transition-colors flex flex-col lg:flex-row lg:items-center gap-3">
               <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="h-9 w-9 rounded-full bg-[#9ad1d4]/50 text-[#003249] flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                <div className="h-9 w-9 rounded-full bg-[#9ad1d4]/50 text-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                   {u.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">

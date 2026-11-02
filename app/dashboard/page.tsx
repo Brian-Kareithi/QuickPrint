@@ -157,7 +157,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-[#003249] text-white rounded-2xl shadow-lg shadow-[#003249]/20 p-5 flex flex-col items-center justify-center text-center">
+        <div className="bg-panel text-white rounded-2xl shadow-lg shadow-[#003249]/20 p-5 flex flex-col items-center justify-center text-center">
           <p className="text-5xl font-bold text-[#80ced7]">{stats?.activeOrders || 0}</p>
           <p className="text-sm text-white/70 mt-1 mb-4">orders in the queue</p>
           <Button variant="secondary" className="bg-white text-[#003249] hover:bg-white/90" onClick={() => router.push('/dashboard/queue')}>View queue</Button>

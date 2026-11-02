@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { QrCode, Upload, Shield, TrendingUp, Building2 } from 'lucide-react';
 
 export default function Home() {
@@ -13,7 +14,8 @@ export default function Home() {
       <header className="border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
           <Logo />
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-1 sm:gap-3">
+            <ThemeToggle />
             {isAuthenticated ? (
               <Link href="/dashboard" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">Dashboard</Link>
             ) : (
@@ -96,11 +98,6 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-border/50 py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center text-sm text-foreground/50">
-          &copy; 2026 QuickPrint. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 }

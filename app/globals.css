@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -7,17 +9,19 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: #ffffff;
-  --color-muted: #e8f0f1;
-  --color-muted-foreground: #5f7b87;
-  --color-accent: #dcebed;
-  --color-accent-foreground: #003249;
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-destructive-foreground: #ffffff;
-  --color-card: #ffffff;
-  --color-card-foreground: #003249;
-  --color-border: #e1eaec;
-  --color-input: #cddcdf;
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: var(--primary);
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --radius: 1rem;
@@ -27,17 +31,53 @@
   /* Palette: Alabaster #ccdbdc, Frosted Blue #9ad1d4 / #80ced7, Cerulean #007ea7, Deep Space #003249 */
   --background: #eef3f5;
   --foreground: #003249;
+  --card: #ffffff;
+  --muted: #e8f0f1;
+  --muted-foreground: #5f7b87;
+  --accent: #dcebed;
+  --border: #e1eaec;
+  --input: #cddcdf;
   --primary: #007ea7;
   --secondary: #003249;
-  --border: #e1eaec;
-  --ink: #003249;
+  --ink: #003249;   /* strong fills: active nav pill, main buttons */
+  --panel: #003249; /* decorative dark panels */
   --frost: #9ad1d4;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0a171e;
+  --foreground: #e3eef2;
+  --card: #112530;
+  --muted: #183341;
+  --muted-foreground: #8fb0bd;
+  --accent: #1d3d4c;
+  --border: #1f3b49;
+  --input: #2b4b5a;
+  --primary: #22a7d4;
+  --secondary: #1d3d4c;
+  --ink: #0b7ea5;
+  --panel: #0f3447;
+  color-scheme: dark;
+
+  /* Remap the tailwind status colours used for alerts and badges */
+  --color-red-50: #3a1a1e; --color-red-100: #4a2227; --color-red-600: #f87171; --color-red-700: #fca5a5;
+  --color-amber-50: #38290f; --color-amber-100: #46340f; --color-amber-200: #5c4518; --color-amber-700: #fbbf24; --color-amber-800: #fcd34d; --color-amber-900: #fde68a;
+  --color-emerald-50: #0f2f29; --color-emerald-100: #11392f; --color-emerald-200: #1a4d40; --color-emerald-800: #6ee7b7;
+  --color-green-50: #0f2f29; --color-green-100: #11392f; --color-green-600: #4ade80; --color-green-800: #86efac;
+  --color-yellow-100: #46390f; --color-yellow-800: #fde047;
+  --color-orange-50: #38230f; --color-orange-200: #5c3a18; --color-orange-600: #fb923c; --color-orange-800: #fdba74;
+  --color-blue-100: #17304d; --color-blue-800: #93c5fd;
+  --color-stone-200: #284049; --color-stone-700: #cfdde2;
 }
 
 html { font-size: 15px; -webkit-text-size-adjust: 100%; }
 body { overflow-x: hidden; }
 @media (max-width: 640px) {
-  html { font-size: 14px; }
+  /* Full-screen pages leave room for the 2.75rem footer so it sits on screen without scrolling */
+.min-h-screen { min-height: calc(100vh - 2.75rem); }
+
+html { font-size: 14px; }
   /* 16px inputs stop iOS zooming on focus */
   input, select, textarea { font-size: 16px !important; }
 }
@@ -80,3 +120,8 @@ button:not(:disabled):active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Theme switch: the new theme grows out of the toggle button as a circle (see components/theme-toggle.tsx) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }

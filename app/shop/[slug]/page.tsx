@@ -176,7 +176,7 @@ export default function CustomerPortal() {
   if (page === 'done' && orderResult) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
-        <div className="max-w-sm w-full text-center space-y-6 bg-white rounded-xl p-8 shadow-lg border">
+        <div className="max-w-sm w-full text-center space-y-6 bg-card rounded-xl p-8 shadow-lg border">
           <div className="h-14 w-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
             <Check className="h-7 w-7 text-green-600" />
           </div>
@@ -192,7 +192,7 @@ export default function CustomerPortal() {
               <div className="flex justify-between"><span className="text-foreground/60">Est. completion</span><span>{new Date(orderResult.estimatedCompletion).toLocaleTimeString()}</span></div>
             )}
           </div>
-          <div className="bg-primary/10 border border-primary/20 text-[#003249] text-xs p-3 rounded-xl text-left space-y-1">
+          <div className="bg-primary/10 border border-primary/20 text-foreground text-xs p-3 rounded-xl text-left space-y-1">
             <p className="font-semibold">How to pay</p>
             {paymentInstructions(shop, orderResult.paymentMethod || orderForm.paymentMethod, orderResult.totalAmount).map((l, i) => <p key={i}>{l}</p>)}
             <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>

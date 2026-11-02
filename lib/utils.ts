@@ -53,8 +53,8 @@ export function getTimeRemaining(deleteAfter: string): string {
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     PENDING: 'bg-amber-100 text-amber-800',
-    CONFIRMED: 'bg-[#9ad1d4]/50 text-[#003249]',
-    PROCESSING: 'bg-[#9ad1d4]/50 text-[#003249]',
+    CONFIRMED: 'bg-[#9ad1d4]/50 text-foreground',
+    PROCESSING: 'bg-[#9ad1d4]/50 text-foreground',
     PRINTING: 'bg-primary/15 text-primary',
     READY_FOR_PICKUP: 'bg-emerald-100 text-emerald-800',
     COMPLETED: 'bg-stone-200 text-stone-700',

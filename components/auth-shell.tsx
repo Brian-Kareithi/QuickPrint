@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Upload, ListChecks, Wallet } from 'lucide-react';
 
 const POINTS = [
@@ -12,7 +13,7 @@ const POINTS = [
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[1.05fr_1fr] p-3 gap-3">
-      <aside className="hidden lg:flex flex-col justify-between rounded-3xl bg-[#003249] text-white p-10 relative overflow-hidden">
+      <aside className="hidden lg:flex flex-col justify-between rounded-3xl bg-panel text-white p-10 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
         <div className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[#80ced7]/20 blur-3xl" />
         <Logo tone="light" />
@@ -34,7 +35,8 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         <p className="relative text-xs text-white/40">&copy; {new Date().getFullYear()} QuickPrint</p>
       </aside>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-1 py-6">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-1 py-6">
+        <ThemeToggle className="absolute top-1 right-1" />
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex justify-center mb-8"><Logo /></div>
           <div className="mb-6 text-center lg:text-left">

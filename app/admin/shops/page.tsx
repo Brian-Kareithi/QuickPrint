@@ -60,7 +60,7 @@ function OwnerPicker({ shop, onDone, onCancel }: { shop: any; onDone: (updated: 
         ) : owners.map((o) => (
           <button key={o.id} type="button" onClick={() => setPicked(o)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${picked?.id === o.id ? 'bg-primary/10' : 'hover:bg-muted/50'}`}>
-            <span className="h-8 w-8 rounded-full bg-[#9ad1d4]/50 text-[#003249] flex items-center justify-center text-sm font-semibold flex-shrink-0">{o.name.charAt(0).toUpperCase()}</span>
+            <span className="h-8 w-8 rounded-full bg-[#9ad1d4]/50 text-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">{o.name.charAt(0).toUpperCase()}</span>
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-medium truncate">{o.name}</span>
               <span className="block text-xs text-foreground/60 truncate">{o.email}{o.ownedShops?.length ? ` · owns ${o.ownedShops.length} shop${o.ownedShops.length > 1 ? 's' : ''}` : ''}</span>
@@ -116,7 +116,7 @@ export default function AdminShops() {
 
   const chip = (f: Filter, label: string) => (
     <button key={label} onClick={() => setFilter(f)}
-      className={`px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${filter === f ? 'bg-[#003249] text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
+      className={`px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${filter === f ? 'bg-ink text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
       {label}
     </button>
   );

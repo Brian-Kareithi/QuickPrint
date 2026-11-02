@@ -80,7 +80,7 @@ export default function OrdersPage() {
 
   const chip = (active: boolean, label: string, onClick: () => void) => (
     <button key={label} onClick={onClick}
-      className={`px-3.5 py-1.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-all ${active ? 'bg-[#003249] text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
+      className={`px-3.5 py-1.5 text-[13px] font-medium rounded-full whitespace-nowrap transition-all ${active ? 'bg-ink text-white shadow-md shadow-[#003249]/20' : 'bg-card border text-foreground/60 hover:bg-muted'}`}>
       {label}
     </button>
   );
