@@ -19,7 +19,7 @@ export default function Home() {
             ) : (
               <>
                 <Link href="/auth/login" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2">Sign in</Link>
-                <Link href="/auth/register" className="text-sm font-medium bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors shadow-sm">Start your shop</Link>
+                <Link href="/auth/register" className="text-sm font-medium bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors shadow-sm">Start your shop</Link>
               </>
             )}
           </nav>
@@ -27,7 +27,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="py-24 md:py-36">
+        <section className="py-14 sm:py-24 md:py-36">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border text-sm text-muted-foreground mb-8">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
@@ -42,17 +42,17 @@ export default function Home() {
               Generate QR codes, accept uploads, manage queues, and process payments.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/auth/register" className="bg-primary text-white px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all shadow-sm">
+              <Link href="/auth/register" className="bg-primary text-white px-7 py-3 rounded-xl text-sm font-medium text-center hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all shadow-sm">
                 Start your shop
               </Link>
-              <Link href="/auth/login" className="border border-border bg-background px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              <Link href="/auth/login" className="border border-border bg-card px-7 py-3 rounded-xl text-sm font-medium text-center hover:bg-muted transition-colors">
                 Sign in
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-muted/40 border-y border-border/50">
+        <section className="py-14 sm:py-20 bg-muted/40 border-y border-border/50">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="grid md:grid-cols-3 gap-6">
               {[
@@ -61,7 +61,7 @@ export default function Home() {
                 { icon: Shield, title: 'Privacy First', desc: 'Documents are automatically deleted one hour after upload, so customer files never linger.' },
               ].map((f, i) => (
                 <div key={i} className="bg-card rounded-2xl p-7 border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <f.icon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="text-base font-semibold mb-1.5">{f.title}</h3>
@@ -72,7 +72,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-20">
+        <section className="py-14 sm:py-20">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Built for African print shops</h2>

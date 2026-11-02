@@ -6,6 +6,8 @@ export interface User {
   role: 'OWNER' | 'STAFF' | 'ADMIN' | 'CUSTOMER'; // ADMIN = super admin, OWNER = shop owner, STAFF = cashier
   avatarUrl?: string;
   clerkId?: string;
+  isSuspended?: boolean;
+  createdAt?: string;
 }
 
 export interface Shop {
@@ -22,6 +24,7 @@ export interface Shop {
   isActive: boolean;
   isSuspended: boolean;
   ownerId: string;
+  isAcceptingOrders?: boolean;
   acceptCash?: boolean;
   mpesaMethod?: string | null;
   mpesaNumber?: string | null;

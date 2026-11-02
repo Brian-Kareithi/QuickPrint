@@ -7,34 +7,40 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: #ffffff;
-  --color-muted: #d3e1e2;
-  --color-muted-foreground: #4f6f7d;
-  --color-accent: #c4dcde;
+  --color-muted: #e8f0f1;
+  --color-muted-foreground: #5f7b87;
+  --color-accent: #dcebed;
   --color-accent-foreground: #003249;
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-destructive-foreground: #ffffff;
-  --color-card: #f6fafa;
+  --color-card: #ffffff;
   --color-card-foreground: #003249;
-  --color-border: #bcd1d4;
-  --color-input: #aac6ca;
+  --color-border: #e1eaec;
+  --color-input: #cddcdf;
   --color-ring: var(--primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --radius: 0.625rem;
+  --radius: 1rem;
 }
 
 :root {
   /* Palette: Alabaster #ccdbdc, Frosted Blue #9ad1d4 / #80ced7, Cerulean #007ea7, Deep Space #003249 */
-  --background: #e3ecec;
+  --background: #eef3f5;
   --foreground: #003249;
   --primary: #007ea7;
   --secondary: #003249;
-  --border: #bcd1d4;
+  --border: #e1eaec;
   --ink: #003249;
   --frost: #9ad1d4;
 }
 
-html { font-size: 14px; } /* compact density across the whole system */
+html { font-size: 15px; -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+@media (max-width: 640px) {
+  html { font-size: 14px; }
+  /* 16px inputs stop iOS zooming on focus */
+  input, select, textarea { font-size: 16px !important; }
+}
 
 body {
   background: var(--background);
@@ -57,18 +63,6 @@ input:focus, select:focus, textarea:focus {
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
   border-color: var(--primary);
-}
-
-/* Soft ambient glow behind the app, easy on the eyes */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(60rem 40rem at 10% -10%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%),
-    radial-gradient(50rem 36rem at 100% 110%, color-mix(in srgb, var(--primary) 6%, transparent), transparent 60%);
 }
 
 html { scroll-behavior: smooth; }

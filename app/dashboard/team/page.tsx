@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, UserPlus, Trash2, Copy, Check } from 'lucide-react';
+import { Loader2, UserPlus, Trash2, Copy, Check, KeyRound } from 'lucide-react';
 
 const empty = { name: '', email: '', phone: '', password: '' };
 
@@ -58,6 +58,20 @@ export default function TeamPage() {
     }
   };
 
+  // Give a cashier a fresh temporary password (e.g. they forgot theirs) and show it once.
+  const resetPassword = async (userId: string, name: string, email: string) => {
+    if (!shopId || !confirm(`Set a new temporary password for ${name}? Their old password will stop working.`)) return;
+    const password = randomPassword();
+    setError('');
+    try {
+      await api.shops.resetStaffPassword(shopId, userId, password);
+      setCreated({ email, password });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err: any) {
+      setError(err.message || 'Could not reset the password');
+    }
+  };
+
   const remove = async (userId: string, name: string) => {
     if (!shopId || !confirm(`Remove ${name} from your shop?`)) return;
     try {
@@ -79,7 +93,7 @@ export default function TeamPage() {
         <p className="text-sm text-foreground/60">Cashiers can see orders, open and print customer files, and mark orders collected. They can&apos;t change prices, branding or the team.</p>
       </div>
 
-      {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+      {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
 
       {created && (
         <div className="bg-green-50 border border-green-100 text-green-800 text-sm p-4 rounded-xl space-y-2">
@@ -125,7 +139,8 @@ export default function TeamPage() {
               <p className="text-sm font-medium truncate">{s.user.name}</p>
               <p className="text-xs text-foreground/50 truncate">{s.user.email}{s.user.phone ? ` · ${s.user.phone}` : ''}</p>
             </div>
-            <Button size="sm" variant="ghost" onClick={() => remove(s.userId, s.user.name)}><Trash2 className="h-3.5 w-3.5 text-red-600" /></Button>
+            <Button size="sm" variant="ghost" title="Reset password" onClick={() => resetPassword(s.userId, s.user.name, s.user.email)}><KeyRound className="h-3.5 w-3.5" /></Button>
+            <Button size="sm" variant="ghost" title="Remove from team" onClick={() => remove(s.userId, s.user.name)}><Trash2 className="h-3.5 w-3.5 text-red-600" /></Button>
           </div>
         ))}
       </div>

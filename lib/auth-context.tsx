@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User>;
   register: (data: { email: string; password: string; name: string; phone?: string; accountType?: 'CUSTOMER' | 'OWNER' }) => Promise<User>;
   logout: () => void;
+  refresh: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isOwner: boolean;
@@ -54,6 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.user as User;
   };
 
+  // Re-read the signed-in user (after editing the profile)
+  const refresh = async () => {
+    setUser(await api.auth.me());
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -69,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        refresh,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'ADMIN',
         isOwner: user?.role === 'OWNER',

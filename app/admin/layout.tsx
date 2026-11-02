@@ -2,16 +2,11 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Building2, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { homeFor } from '@/lib/roles';
 import { AppShell } from '@/components/app-shell';
+import { navFor } from '@/lib/nav';
 
-const NAV = [
-  { href: '/admin', icon: LayoutDashboard, label: 'Overview' },
-  { href: '/admin/shops', icon: Building2, label: 'Shops & owners' },
-  { href: '/admin/system', icon: Shield, label: 'System' },
-];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, loading, logout } = useAuth();
@@ -28,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <AppShell nav={NAV} title="Super admin" user={user} roleLabel="Super admin" onLogout={logout}>
+    <AppShell nav={navFor('ADMIN').nav} title="Super admin" user={user} roleLabel="Super admin" onLogout={logout}>
       {children}
     </AppShell>
   );

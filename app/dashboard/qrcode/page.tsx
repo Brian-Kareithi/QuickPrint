@@ -59,7 +59,7 @@ export default function QRCodePage() {
           <label className="text-xs font-medium text-foreground/60">Your shop link</label>
           <div className="flex gap-2">
             <input readOnly value={customerUrl} onFocus={(e) => e.target.select()}
-              className="flex-1 min-w-0 h-10 rounded-lg border border-input bg-background px-3 text-sm" />
+              className="flex-1 min-w-0 h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm" />
             <Button variant="outline" onClick={copy}>
               {copied ? <Check className="h-4 w-4 mr-1.5" /> : <Copy className="h-4 w-4 mr-1.5" />}{copied ? 'Copied' : 'Copy'}
             </Button>

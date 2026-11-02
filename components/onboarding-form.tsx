@@ -45,7 +45,7 @@ export function OnboardingForm({ onCreated }: { onCreated: (shop: Shop) => void 
         </div>
       </div>
 
-      {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+      {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
 
       <section className="space-y-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/50">Business details</h3>

@@ -55,7 +55,7 @@ export default function PaymentsPage() {
           <p className="text-xs text-foreground/60">Customers see these after placing an order. When they pay, mark the order as paid from the queue or orders page.</p>
         </div>
         <div className="bg-card rounded-2xl border shadow-sm p-5 space-y-5">
-          {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+          {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
           <PaymentFields value={payment} onChange={setPayment} />
           <Button onClick={save} disabled={saving}>
             <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save payment details'}

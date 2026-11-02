@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [staffCount, setStaffCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'STAFF') router.replace('/dashboard/queue');
@@ -55,15 +56,47 @@ export default function DashboardPage() {
     { done: hasOrders, label: 'Receive your first order', href: '/dashboard/queue' },
   ];
   const remaining = steps.filter((s) => !s.done).length;
+  const accepting = shop.isAcceptingOrders !== false;
+
+  const toggleAccepting = async () => {
+    setToggling(true);
+    try {
+      const updated = await api.shops.update(shop.id, { isAcceptingOrders: !accepting });
+      setShop({ ...shop, isAcceptingOrders: updated.isAcceptingOrders });
+    } catch (e: any) {
+      alert(e.message || 'Could not update your shop');
+    } finally {
+      setToggling(false);
+    }
+  };
 
   return (
     <div className="space-y-5">
       {shops.length > 1 && (
         <select value={shop.id} onChange={(e) => setShop(shops.find((s) => s.id === e.target.value) || shop)}
-          className="text-sm border border-input rounded-lg px-3 py-2 bg-background">
+          className="text-sm border border-input rounded-xl px-3 py-2.5 bg-card">
           {shops.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
       )}
+
+      <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 transition-colors ${accepting ? 'bg-[#9ad1d4]/25 border-[#9ad1d4]' : 'bg-amber-50 border-amber-200'}`}>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">{accepting ? 'Your shop is open for orders' : 'Orders are paused'}</p>
+          <p className="text-xs text-foreground/60">
+            {accepting ? 'Customers can upload files and place orders.' : 'Customers can see your page but cannot place new orders.'}
+          </p>
+        </div>
+        <button
+          role="switch"
+          aria-checked={accepting}
+          disabled={toggling}
+          onClick={toggleAccepting}
+          className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors disabled:opacity-60 ${accepting ? 'bg-primary' : 'bg-foreground/25'}`}
+          title={accepting ? 'Pause new orders' : 'Accept orders again'}
+        >
+          <span className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${accepting ? 'translate-x-5' : ''}`} />
+        </button>
+      </div>
 
       {remaining > 0 && (
         <div className="bg-card rounded-2xl border shadow-sm p-5">

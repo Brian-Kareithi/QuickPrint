@@ -64,7 +64,7 @@ export default function SettingsPage() {
             {type === 'textarea' ? (
               <textarea value={(form as any)[key]}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow"
+                className="block w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow"
                 rows={key === 'welcomeMessage' ? 3 : 2} />
             ) : (
               <Input value={(form as any)[key]}
@@ -72,7 +72,7 @@ export default function SettingsPage() {
             )}
           </div>
         ))}
-        {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+        {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
         <Button onClick={handleSave} disabled={saving}>
           <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save changes'}
         </Button>

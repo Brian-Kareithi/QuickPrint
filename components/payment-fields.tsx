@@ -46,7 +46,7 @@ const Field = ({ label, children, hint }: { label: string; children: React.React
 
 export function PaymentFields({ value, onChange }: { value: PaymentValues; onChange: (v: PaymentValues) => void }) {
   const set = (k: keyof PaymentValues, v: string | boolean) => onChange({ ...value, [k]: v });
-  const selectClass = 'block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm';
+  const selectClass = 'block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm';
 
   return (
     <div className="space-y-5">
@@ -97,7 +97,7 @@ export function PaymentFields({ value, onChange }: { value: PaymentValues; onCha
 
       <Field label="Note to customers (optional)" hint="Shown with the payment instructions after an order">
         <textarea value={value.paymentNotes} onChange={(e) => set('paymentNotes', e.target.value)} rows={2}
-          className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+          className="block w-full rounded-xl border border-input bg-card px-3 py-2 text-sm" />
       </Field>
     </div>
   );

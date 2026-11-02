@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { Loader2, Building2, Users, ShoppingBag, DollarSign, CheckCircle2, PauseCircle } from 'lucide-react';
@@ -13,7 +14,7 @@ export default function AdminOverview() {
     api.admin.stats().then(setStats).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>;
+  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>;
   if (!stats) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   const cards = [
@@ -37,6 +38,27 @@ export default function AdminOverview() {
             <div className="text-2xl font-semibold tracking-tight mt-1">{c.value}</div>
           </div>
         ))}
+      </div>
+
+      <div className="bg-card rounded-2xl border shadow-sm p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold">People on the platform</h3>
+          <span className="text-xs text-foreground/50">{stats.newUsers7d} new in the last 7 days</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { role: 'ADMIN', label: 'Super admins' },
+            { role: 'OWNER', label: 'Shop owners' },
+            { role: 'STAFF', label: 'Cashiers' },
+            { role: 'CUSTOMER', label: 'Customers' },
+          ].map((r) => (
+            <Link key={r.role} href="/admin/users"
+              className="rounded-xl bg-muted/60 hover:bg-muted p-3.5 transition-colors">
+              <p className="text-xl font-semibold">{stats.usersByRole?.[r.role] ?? 0}</p>
+              <p className="text-xs text-foreground/60">{r.label}</p>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="bg-card rounded-2xl border shadow-sm">

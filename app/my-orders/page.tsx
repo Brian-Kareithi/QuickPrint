@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Receipt, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { navFor } from '@/lib/nav';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { AppShell } from '@/components/app-shell';
@@ -29,7 +30,7 @@ export default function MyOrdersPage() {
 
   return (
     <AppShell
-      nav={[{ href: '/my-orders', icon: Receipt, label: 'My orders' }]}
+      nav={navFor('CUSTOMER').nav}
       title="My orders"
       user={user}
       roleLabel="Customer"

@@ -14,8 +14,8 @@ import { Upload, FileText, X, Printer, Check, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import type { Shop, PriceBreakdown } from '@/types';
 
-const inputClass = "block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
-const selectClass = "block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
+const inputClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
+const selectClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
 /** Best-effort page count for PDFs (counts page objects). The customer can correct it. */
 async function detectPdfPages(file: File): Promise<number> {
@@ -86,7 +86,7 @@ export default function CustomerPortal() {
   }, [shop]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop, disabled: uploading || !shop,
+    onDrop, disabled: uploading || !shop || shop.isAcceptingOrders === false,
     accept: {
       'application/pdf': ['.pdf'], 'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
@@ -192,7 +192,7 @@ export default function CustomerPortal() {
               <div className="flex justify-between"><span className="text-foreground/60">Est. completion</span><span>{new Date(orderResult.estimatedCompletion).toLocaleTimeString()}</span></div>
             )}
           </div>
-          <div className="bg-primary/10 border border-primary/20 text-[#003249] text-xs p-3 rounded-lg text-left space-y-1">
+          <div className="bg-primary/10 border border-primary/20 text-[#003249] text-xs p-3 rounded-xl text-left space-y-1">
             <p className="font-semibold">How to pay</p>
             {paymentInstructions(shop, orderResult.paymentMethod || orderForm.paymentMethod, orderResult.totalAmount).map((l, i) => <p key={i}>{l}</p>)}
             <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>
@@ -221,8 +221,15 @@ export default function CustomerPortal() {
           ))}
         </div>
 
+        {shop.isAcceptingOrders === false && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 text-sm p-4 rounded-xl text-center">
+            <p className="font-semibold">{shop.name} isn&apos;t taking new orders right now</p>
+            <p className="text-xs mt-1 text-amber-800/80">Please check back a little later{shop.phone ? ` or call ${shop.phone}` : ''}.</p>
+          </div>
+        )}
+
         {error && (
-          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>
+          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>
         )}
 
         {page === 'upload' && (

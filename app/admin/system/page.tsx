@@ -16,7 +16,7 @@ export default function AdminSystem() {
       .catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>;
+  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>;
   if (!health) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (

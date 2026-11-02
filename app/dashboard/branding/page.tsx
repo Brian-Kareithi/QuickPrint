@@ -60,7 +60,7 @@ export default function BrandingPage() {
             <div className="flex items-center gap-3">
               <input type="color" value={branding?.primaryColor || '#000000'}
                 onChange={(e) => updateColor('primaryColor', e.target.value)}
-                className="h-10 w-14 rounded-lg border cursor-pointer" />
+                className="h-10 w-14 rounded-xl border cursor-pointer" />
               <Input value={branding?.primaryColor || ''}
                 onChange={(e) => updateColor('primaryColor', e.target.value)} />
             </div>
@@ -70,7 +70,7 @@ export default function BrandingPage() {
             <div className="flex items-center gap-3">
               <input type="color" value={branding?.secondaryColor || '#000000'}
                 onChange={(e) => updateColor('secondaryColor', e.target.value)}
-                className="h-10 w-14 rounded-lg border cursor-pointer" />
+                className="h-10 w-14 rounded-xl border cursor-pointer" />
               <Input value={branding?.secondaryColor || ''}
                 onChange={(e) => updateColor('secondaryColor', e.target.value)} />
             </div>
@@ -80,7 +80,7 @@ export default function BrandingPage() {
             <div className="flex items-center gap-3">
               <input type="color" value={branding?.backgroundColor || '#ffffff'}
                 onChange={(e) => updateColor('backgroundColor', e.target.value)}
-                className="h-10 w-14 rounded-lg border cursor-pointer" />
+                className="h-10 w-14 rounded-xl border cursor-pointer" />
               <Input value={branding?.backgroundColor || ''}
                 onChange={(e) => updateColor('backgroundColor', e.target.value)} />
             </div>
@@ -104,13 +104,13 @@ export default function BrandingPage() {
             <label className="text-xs font-medium text-foreground/60 uppercase tracking-wider block mb-3">Button style</label>
             <select value={branding?.buttonStyle || 'rounded'}
               onChange={(e) => setBranding({ ...branding, buttonStyle: e.target.value })}
-              className="block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm">
+              className="block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm">
               <option value="rounded">Rounded</option>
               <option value="square">Square</option>
               <option value="pill">Pill</option>
             </select>
           </div>
-          {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+          {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
           <Button onClick={handleSave} disabled={saving}>
             <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save branding'}
           </Button>

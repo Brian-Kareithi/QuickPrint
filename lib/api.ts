@@ -55,6 +55,10 @@ export const api = {
         body: JSON.stringify(data),
       }),
     me: () => request<any>('/auth/me'),
+    updateProfile: (data: { name?: string; phone?: string }) =>
+      request<any>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
+    changePassword: (currentPassword: string, newPassword: string) =>
+      request<any>('/auth/change-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }),
   },
   shops: {
     create: (data: Record<string, any>) =>
@@ -71,6 +75,8 @@ export const api = {
     staff: (id: string) => request<any[]>(`/shops/${id}/staff`),
     addStaff: (id: string, data: { name: string; email: string; password: string; phone?: string }) =>
       request<any>(`/shops/${id}/staff`, { method: 'POST', body: JSON.stringify(data) }),
+    resetStaffPassword: (id: string, userId: string, password: string) =>
+      request<any>(`/shops/${id}/staff/${userId}/password`, { method: 'PATCH', body: JSON.stringify({ password }) }),
     removeStaff: (id: string, userId: string) =>
       request<any>(`/shops/${id}/staff/${userId}`, { method: 'DELETE' }),
     updateServices: (id: string, data: any[]) =>
@@ -183,6 +189,14 @@ export const api = {
     stats: () => request<any>('/admin/stats'),
     shops: (page = 1, limit = 50, status?: string) =>
       request<any>(`/admin/shops?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}`),
+    users: (params: { q?: string; role?: string; page?: number; limit?: number } = {}) => {
+      const qs = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') qs.set(k, String(v)); });
+      return request<any>(`/admin/users?${qs}`);
+    },
+    updateUser: (id: string, data: { role?: string; isSuspended?: boolean }) =>
+      request<any>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    activity: (page = 1) => request<any>(`/admin/activity?page=${page}`),
     suspend: (id: string) => request<any>(`/admin/shops/${id}/suspend`, { method: 'POST' }),
     activate: (id: string) => request<any>(`/admin/shops/${id}/activate`, { method: 'POST' }),
     health: () => request<any>('/admin/health'),
