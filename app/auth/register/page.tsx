@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Printer } from 'lucide-react';
+import { LogoMark } from '@/components/logo';
+import { homeFor } from '@/lib/roles';
 
 export default function RegisterPage() {
   const [data, setData] = useState({ name: '', email: '', password: '', phone: '' });
+  const [accountType, setAccountType] = useState<'OWNER' | 'CUSTOMER'>('OWNER');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -18,8 +20,8 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      await register(data);
-      router.push('/dashboard');
+      const user = await register({ ...data, accountType });
+      router.push(homeFor(user));
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {
@@ -30,19 +32,25 @@ export default function RegisterPage() {
   const inputClass = "block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-            <Printer className="h-5 w-5 text-white" />
-          </div>
+          <LogoMark className="h-12 w-12 mx-auto mb-4 drop-shadow-sm" />
           <h1 className="text-xl font-semibold tracking-tight">Create your account</h1>
-          <p className="text-sm text-foreground/60 mt-1">Start managing your print shop</p>
+          <p className="text-sm text-foreground/60 mt-1">{accountType === 'OWNER' ? 'Start managing your print shop' : 'Track your print orders'}</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-card rounded-xl border shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="page-enter bg-card/90 backdrop-blur rounded-2xl border shadow-xl shadow-black/5 p-7 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>
           )}
+          <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
+            {([['OWNER', 'Shop owner'], ['CUSTOMER', 'Customer']] as const).map(([v, l]) => (
+              <button type="button" key={v} onClick={() => setAccountType(v)}
+                className={`h-8 rounded-md text-sm font-medium transition-colors ${accountType === v ? 'bg-background shadow-sm' : 'text-foreground/60'}`}>
+                {l}
+              </button>
+            ))}
+          </div>
           {(['name', 'email', 'password', 'phone'] as const).map((field) => (
             <div key={field}>
               <label className="text-sm font-medium block mb-1.5 capitalize">{field === 'phone' ? 'Phone (optional)' : field}</label>
@@ -52,7 +60,8 @@ export default function RegisterPage() {
                 onChange={(e) => setData({ ...data, [field]: e.target.value })}
                 className={inputClass}
                 required={field !== 'phone'}
-                placeholder={field === 'phone' ? '+254 700 000 000' : `Enter your ${field}`}
+                minLength={field === 'password' ? 8 : undefined}
+                placeholder={field === 'phone' ? '+254 700 000 000' : field === 'password' ? 'At least 8 characters' : `Enter your ${field}`}
               />
             </div>
           ))}

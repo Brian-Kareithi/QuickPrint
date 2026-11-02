@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PrintFileButton } from '@/components/print-file-button';
 import { formatCurrency, formatDateTime, getStatusColor, getPaymentStatusColor } from '@/lib/utils';
 import { Loader2, Search } from 'lucide-react';
 
@@ -11,12 +12,13 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     api.shops.mine().then((shops) => {
       if (shops.length > 0) api.orders.list(shops[0].id).then(setOrders).finally(() => setLoading(false));
       else setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, []);
 
   const filtered = filter ? orders.filter((o) =>
@@ -56,15 +58,34 @@ export default function OrdersPage() {
             </thead>
             <tbody>
               {filtered.map((order) => (
-                <tr key={order.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                <Fragment key={order.id}>
+                <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                   <td className="p-4 font-medium text-sm">{order.orderNumber}</td>
                   <td className="p-4 text-sm">{order.customerName || 'Walk-in'}</td>
                   <td className="p-4"><Badge className={getStatusColor(order.status)}>{order.status}</Badge></td>
                   <td className="p-4"><Badge className={getPaymentStatusColor(order.paymentStatus)}>{order.paymentStatus}</Badge></td>
                   <td className="p-4 font-semibold text-sm">{formatCurrency(order.totalAmount)}</td>
                   <td className="p-4 text-sm text-foreground/60">{formatDateTime(order.createdAt)}</td>
-                  <td className="p-4"><Button variant="outline" size="sm">View</Button></td>
+                  <td className="p-4"><Button variant="outline" size="sm" onClick={() => setExpanded(expanded === order.id ? null : order.id)}>{expanded === order.id ? 'Hide' : 'Files'}</Button></td>
                 </tr>
+                {expanded === order.id && (
+                  <tr className="border-b border-border/50 bg-muted/20">
+                    <td colSpan={7} className="p-4 space-y-2">
+                      {order.items?.map((item: any) => (
+                        <div key={item.id} className="flex items-center gap-3 text-xs text-foreground/70">
+                          <span className="truncate font-medium">{item.fileName}</span>
+                          <span>&middot; {item.copies}x</span>
+                          <span>&middot; {item.colorMode === 'FULL_COLOR' ? 'Color' : 'B&W'}</span>
+                          <span>&middot; {item.paperSize}</span>
+                          <span>&middot; {item.pageCount}pgs</span>
+                          <span className="flex-1" />
+                          <PrintFileButton item={item} />
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
               {filtered.length === 0 && (
                 <tr><td colSpan={7} className="p-12 text-center text-sm text-foreground/50">No orders found</td></tr>

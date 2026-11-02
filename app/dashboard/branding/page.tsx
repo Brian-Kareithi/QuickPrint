@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save, Printer } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
+import { LogoMark } from '@/components/logo';
 
 const COLORS = [
-  '#2563eb', '#1e40af', '#16a34a', '#15803d', '#ca8a04',
-  '#a16207', '#dc2626', '#b91c1c', '#7c3aed', '#6d28d9',
+  '#0f766e', '#2563eb', '#16a34a', '#ca8a04', '#dc2626',
+  '#7c3aed', '#db2777', '#ea580c', '#0891b2', '#334155',
 ];
 
 export default function BrandingPage() {
@@ -16,6 +17,8 @@ export default function BrandingPage() {
   const [branding, setBranding] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api.shops.mine().then(async (shops) => {
@@ -24,8 +27,7 @@ export default function BrandingPage() {
         setShop(s);
         setBranding(s.branding || { primaryColor: '#2563eb', secondaryColor: '#1e40af', backgroundColor: '#ffffff', buttonStyle: 'rounded', backgroundStyle: 'solid' });
       }
-      setLoading(false);
-    });
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const updateColor = (key: string, value: string) => setBranding({ ...branding, [key]: value });
@@ -33,8 +35,17 @@ export default function BrandingPage() {
   const handleSave = async () => {
     if (!shop) return;
     setSaving(true);
-    await api.shops.updateBranding(shop.id, branding);
-    setSaving(false);
+    setError('');
+    try {
+      const { id: _id, shopId: _shopId, ...fields } = branding;
+      await api.shops.updateBranding(shop.id, fields);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Could not save');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
@@ -85,6 +96,11 @@ export default function BrandingPage() {
             </div>
           </div>
           <div>
+            <label className="text-xs font-medium text-foreground/60 uppercase tracking-wider block mb-3">Logo URL (optional)</label>
+            <Input value={branding?.logoUrl || ''} placeholder="https://..."
+              onChange={(e) => setBranding({ ...branding, logoUrl: e.target.value })} />
+          </div>
+          <div>
             <label className="text-xs font-medium text-foreground/60 uppercase tracking-wider block mb-3">Button style</label>
             <select value={branding?.buttonStyle || 'rounded'}
               onChange={(e) => setBranding({ ...branding, buttonStyle: e.target.value })}
@@ -94,8 +110,9 @@ export default function BrandingPage() {
               <option value="pill">Pill</option>
             </select>
           </div>
+          {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
           <Button onClick={handleSave} disabled={saving}>
-            <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : 'Save branding'}
+            <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save branding'}
           </Button>
         </div>
       </div>
@@ -106,9 +123,7 @@ export default function BrandingPage() {
           <div className="p-6">
             <div className="rounded-xl border bg-white p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: branding?.primaryColor }}>
-                  <Printer className="h-5 w-5 text-white" />
-                </div>
+                <div style={{ ['--primary' as any]: branding?.primaryColor }}><LogoMark className="h-10 w-10" /></div>
                 <div>
                   <h3 className="font-semibold text-sm" style={{ color: branding?.primaryColor }}>{shop?.name || 'Shop Name'}</h3>
                   <p className="text-xs text-foreground/60">Upload your documents for printing</p>

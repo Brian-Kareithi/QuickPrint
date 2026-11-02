@@ -1,5 +1,27 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
+/**
+ * Public address of this web app, encoded into shop QR codes. Set NEXT_PUBLIC_APP_URL to
+ * something a customer's phone can reach (LAN IP or the deployed domain) - "localhost"
+ * only works on the machine running the app.
+ */
+export function getAppUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL;
+  if (configured) return configured.replace(/\/+$/, '');
+  return typeof window !== 'undefined' ? window.location.origin : '';
+}
+
+const authHeader = (): Record<string, string> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+async function errorMessage(res: Response): Promise<string> {
+  const body = await res.json().catch(() => null);
+  const msg = body?.message;
+  return (Array.isArray(msg) ? msg.join(', ') : msg) || `HTTP ${res.status}`;
+}
+
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const headers: Record<string, string> = {
@@ -13,10 +35,7 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     headers,
   });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(await errorMessage(res));
 
   return res.json();
 }
@@ -28,7 +47,7 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       }),
-    register: (data: { email: string; password: string; name: string; phone?: string }) =>
+    register: (data: { email: string; password: string; name: string; phone?: string; accountType?: 'CUSTOMER' | 'OWNER' }) =>
       request<{ user: any; token: string }>('/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -47,24 +66,28 @@ export const api = {
       request<any>(`/shops/${id}/branding`, { method: 'PATCH', body: JSON.stringify(data) }),
     updatePricing: (id: string, data: any) =>
       request<any>(`/shops/${id}/pricing`, { method: 'PATCH', body: JSON.stringify(data) }),
+    staff: (id: string) => request<any[]>(`/shops/${id}/staff`),
+    addStaff: (id: string, data: { name: string; email: string; password: string; phone?: string }) =>
+      request<any>(`/shops/${id}/staff`, { method: 'POST', body: JSON.stringify(data) }),
+    removeStaff: (id: string, userId: string) =>
+      request<any>(`/shops/${id}/staff/${userId}`, { method: 'DELETE' }),
     updateServices: (id: string, data: any[]) =>
       request<any>(`/shops/${id}/services`, { method: 'PUT', body: JSON.stringify(data) }),
   },
   qrcode: {
-    get: (slug: string) => request<{ url: string; qrDataUrl: string; qrSvg: string }>(`/qrcode/${slug}`),
-    poster: (slug: string) => `${API_BASE}/qrcode/${slug}/print-poster`,
-    download: (slug: string) => `${API_BASE}/qrcode/${slug}/poster`,
+    get: (slug: string) =>
+      request<{ url: string; qrDataUrl: string; qrSvg: string }>(`/qrcode/${slug}?baseUrl=${encodeURIComponent(getAppUrl())}`),
+    poster: (slug: string) => `${API_BASE}/qrcode/${slug}/print-poster?baseUrl=${encodeURIComponent(getAppUrl())}`,
+    download: (slug: string) => `${API_BASE}/qrcode/${slug}/poster?baseUrl=${encodeURIComponent(getAppUrl())}`,
   },
   uploads: {
     upload: async (shopId: string, file: File, onProgress?: (pct: number) => void) => {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
 
       return new Promise<any>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `${API_BASE}/uploads/${shopId}`);
-        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
@@ -72,7 +95,11 @@ export const api = {
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-          else reject(new Error('Upload failed'));
+          else {
+            let msg = 'Upload failed';
+            try { const m = JSON.parse(xhr.responseText).message; msg = Array.isArray(m) ? m.join(', ') : m || msg; } catch {}
+            reject(new Error(msg));
+          }
         };
 
         xhr.onerror = () => reject(new Error('Upload failed'));
@@ -81,6 +108,22 @@ export const api = {
     },
     list: (shopId: string) => request<any[]>(`/uploads/shop/${shopId}`),
     get: (id: string) => request<any>(`/uploads/${id}`),
+    /** Fetch a customer's file (owner only) and open it in a new tab so it can be printed. */
+    open: async (id: string) => {
+      const win = window.open('', '_blank'); // opened synchronously so popup blockers allow it
+      try {
+        const res = await fetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() });
+        if (!res.ok) throw new Error(await errorMessage(res));
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        if (win) win.location.href = url;
+        else window.location.href = url;
+        setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+      } catch (err) {
+        win?.close();
+        throw err;
+      }
+    },
   },
   pricing: {
     calculate: (shopId: string, items: any[]) =>
@@ -97,6 +140,7 @@ export const api = {
     ready: (shopId: string) => request<any[]>(`/orders/ready/${shopId}`),
     completed: (shopId: string) => request<any[]>(`/orders/completed/${shopId}`),
     get: (id: string) => request<any>(`/orders/${id}`),
+    mine: () => request<any[]>('/orders/mine'),
     byNumber: (num: string) => request<any>(`/orders/number/${num}`),
     updateStatus: (id: string, status: string) =>
       request<any>(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
@@ -133,7 +177,8 @@ export const api = {
   },
   admin: {
     stats: () => request<any>('/admin/stats'),
-    shops: (page = 1, limit = 20) => request<any>(`/admin/shops?page=${page}&limit=${limit}`),
+    shops: (page = 1, limit = 50, status?: string) =>
+      request<any>(`/admin/shops?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}`),
     suspend: (id: string) => request<any>(`/admin/shops/${id}/suspend`, { method: 'POST' }),
     activate: (id: string) => request<any>(`/admin/shops/${id}/activate`, { method: 'POST' }),
     health: () => request<any>('/admin/health'),

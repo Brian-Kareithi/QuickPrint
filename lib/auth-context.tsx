@@ -8,12 +8,14 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; name: string; phone?: string }) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: { email: string; password: string; name: string; phone?: string; accountType?: 'CUSTOMER' | 'OWNER' }) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isOwner: boolean;
+  isStaff: boolean;
+  isCustomer: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,13 +43,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', res.token);
     setToken(res.token);
     setUser(res.user);
+    return res.user as User;
   };
 
-  const register = async (data: { email: string; password: string; name: string; phone?: string }) => {
+  const register = async (data: { email: string; password: string; name: string; phone?: string; accountType?: 'CUSTOMER' | 'OWNER' }) => {
     const res = await api.auth.register(data);
     localStorage.setItem('token', res.token);
     setToken(res.token);
     setUser(res.user);
+    return res.user as User;
   };
 
   const logout = () => {
@@ -68,6 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isAdmin: user?.role === 'ADMIN',
         isOwner: user?.role === 'OWNER',
+        isStaff: user?.role === 'STAFF',
+        isCustomer: user?.role === 'CUSTOMER',
       }}
     >
       {children}

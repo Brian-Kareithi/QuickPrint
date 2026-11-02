@@ -7,16 +7,16 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: #ffffff;
-  --color-muted: oklch(0.965 0 0);
-  --color-muted-foreground: oklch(0.55 0 0);
-  --color-accent: oklch(0.965 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
+  --color-muted: #ebe8df;
+  --color-muted-foreground: #6b6f6c;
+  --color-accent: #e6e3d9;
+  --color-accent-foreground: #1c1f1e;
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-destructive-foreground: #ffffff;
-  --color-card: #ffffff;
-  --color-card-foreground: oklch(0.145 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
+  --color-card: #fffefb;
+  --color-card-foreground: #1c1f1e;
+  --color-border: #e1ded2;
+  --color-input: #d9d6c9;
   --color-ring: var(--primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -24,10 +24,12 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0c0c0c;
-  --primary: #2563eb;
-  --secondary: #1e40af;
+  /* Calm paper-and-ink palette with a single teal accent */
+  --background: #f6f5f0;
+  --foreground: #1c1f1e;
+  --primary: #0f766e;
+  --secondary: #115e59;
+  --border: #e1ded2;
 }
 
 body {
@@ -43,12 +45,40 @@ body {
 }
 
 ::selection {
-  background-color: oklch(0.9 0.1 240);
+  background-color: #bfe6df;
   color: #000;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  ring: 2px solid var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
   border-color: var(--primary);
+}
+
+/* Soft ambient glow behind the app, easy on the eyes */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 10% -10%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%),
+    radial-gradient(50rem 36rem at 100% 110%, color-mix(in srgb, var(--primary) 6%, transparent), transparent 60%);
+}
+
+html { scroll-behavior: smooth; }
+
+/* Smooth page transitions */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.page-enter { animation: page-enter 0.35s ease-out both; }
+
+button, a, select, input, textarea { transition-property: color, background-color, border-color, box-shadow, transform, opacity; transition-duration: 150ms; }
+button:not(:disabled):active { transform: scale(0.98); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

@@ -13,11 +13,13 @@ export default function SettingsPage() {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api.shops.mine().then((shops) => {
-      if (shops.length > 0) {
-        api.shops.byId(shops[0].id).then((s) => {
+      const own = shops;
+      if (own.length > 0) {
+        api.shops.byId(own[0].id).then((s) => {
           setShop(s);
           setForm({
             name: s.name, description: s.description || '', email: s.email || '',
@@ -31,10 +33,16 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (!shop) return;
     setSaving(true);
-    await api.shops.update(shop.id, form);
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setError('');
+    try {
+      await api.shops.update(shop.id, form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Could not save');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!shop) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
@@ -64,6 +72,7 @@ export default function SettingsPage() {
             )}
           </div>
         ))}
+        {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
         <Button onClick={handleSave} disabled={saving}>
           <Save className="h-4 w-4 mr-1.5" /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save changes'}
         </Button>

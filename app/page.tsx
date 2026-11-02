@@ -2,7 +2,8 @@
 
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
-import { Printer, QrCode, Upload, Shield, TrendingUp, Building2 } from 'lucide-react';
+import { Logo } from '@/components/logo';
+import { QrCode, Upload, Shield, TrendingUp, Building2 } from 'lucide-react';
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -11,12 +12,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Printer className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-lg font-semibold tracking-tight">QuickPrint</span>
-          </div>
+          <Logo />
           <nav className="flex items-center gap-3">
             {isAuthenticated ? (
               <Link href="/dashboard" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">Dashboard</Link>
@@ -46,7 +42,7 @@ export default function Home() {
               Generate QR codes, accept uploads, manage queues, and process payments.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/auth/register" className="bg-primary text-white px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+              <Link href="/auth/register" className="bg-primary text-white px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md transition-all shadow-sm">
                 Start your shop
               </Link>
               <Link href="/auth/login" className="border border-border bg-background px-7 py-2.5 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
@@ -62,9 +58,9 @@ export default function Home() {
               {[
                 { icon: QrCode, title: 'QR Code Upload', desc: 'Customers scan a QR code to instantly upload documents from their phone. No app required.' },
                 { icon: Upload, title: 'Smart Queue', desc: 'Real-time print queue with live updates. Staff sees new orders the moment they come in.' },
-                { icon: Shield, title: 'Privacy First', desc: 'Documents are automatically deleted after 2 hours. Zero data retention. Fully GDPR-compliant.' },
+                { icon: Shield, title: 'Privacy First', desc: 'Documents are automatically deleted one hour after upload, so customer files never linger.' },
               ].map((f, i) => (
-                <div key={i} className="bg-card rounded-xl p-7 border shadow-sm">
+                <div key={i} className="bg-card rounded-2xl p-7 border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
                   <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                     <f.icon className="h-5 w-5 text-primary" />
                   </div>
@@ -87,9 +83,9 @@ export default function Home() {
                 { icon: Building2, title: 'Multi-tenant', desc: 'Each shop gets its own branded portal with isolated data' },
                 { icon: TrendingUp, title: 'Analytics', desc: 'Track revenue, pages printed, and peak hours' },
                 { icon: Upload, title: 'M-Pesa ready', desc: 'Built-in mobile money and card payment support' },
-                { icon: Shield, title: 'Auto-deletion', desc: 'GDPR-compliant document handling with 2-hour retention' },
+                { icon: Shield, title: 'Auto-deletion', desc: 'Every uploaded document is deleted after one hour' },
               ].map((f, i) => (
-                <div key={i} className="bg-card rounded-xl p-6 border shadow-sm">
+                <div key={i} className="bg-card rounded-2xl p-6 border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
                   <f.icon className="h-6 w-6 text-primary mb-3" />
                   <h3 className="text-sm font-semibold mb-1">{f.title}</h3>
                   <p className="text-xs text-foreground/60 leading-relaxed">{f.desc}</p>

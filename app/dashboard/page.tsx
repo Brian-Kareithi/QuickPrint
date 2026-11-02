@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDateTime, getStatusColor } from '@/lib/utils';
 import { DollarSign, ShoppingBag, FileText, TrendingUp, ClipboardList, Plus, Loader2 } from 'lucide-react';
@@ -10,17 +11,23 @@ import type { Shop, DashboardStats } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [shops, setShops] = useState<Shop[]>([]);
   const [activeShop, setActiveShop] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [newShopName, setNewShopName] = useState('');
+
+  useEffect(() => {
+    if (user?.role === 'STAFF') router.replace('/dashboard/queue');
+  }, [user, router]);
 
   useEffect(() => {
     api.shops.mine().then((data) => {
       setShops(data);
       if (data.length > 0) setActiveShop(data[0].id);
-    }).finally(() => setLoading(false));
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -36,15 +43,22 @@ export default function DashboardPage() {
           <ClipboardList className="h-7 w-7 text-foreground/40" />
         </div>
         <h2 className="text-lg font-semibold">No shops yet</h2>
-        <p className="text-sm text-foreground/60">Create your first print shop to get started</p>
+        <p className="text-sm text-foreground/60">Name your print shop to generate its QR code</p>
+        <input
+          value={newShopName}
+          onChange={(e) => setNewShopName(e.target.value)}
+          placeholder="e.g. Kamau Cyber Cafe"
+          className="block w-64 h-10 rounded-lg border border-input bg-background px-3 text-sm"
+        />
         <Button onClick={async () => {
+          if (!newShopName.trim()) return;
           setCreating(true);
           try {
-            const shop = await api.shops.create({ name: 'My Print Shop' });
+            const shop = await api.shops.create({ name: newShopName.trim() });
             setShops([shop]);
             setActiveShop(shop.id);
           } finally { setCreating(false); }
-        }} disabled={creating}>
+        }} disabled={creating || !newShopName.trim()}>
           <Plus className="h-4 w-4 mr-1.5" /> {creating ? 'Creating...' : 'Create shop'}
         </Button>
       </div>

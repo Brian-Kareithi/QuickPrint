@@ -52,25 +52,25 @@ export function getTimeRemaining(deleteAfter: string): string {
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    PROCESSING: 'bg-indigo-100 text-indigo-800',
-    PRINTING: 'bg-purple-100 text-purple-800',
-    READY_FOR_PICKUP: 'bg-green-100 text-green-800',
-    COMPLETED: 'bg-gray-100 text-gray-800',
-    COLLECTED: 'bg-gray-100 text-gray-800',
-    CANCELLED: 'bg-red-100 text-red-800',
+    PENDING: 'bg-amber-100 text-amber-800',
+    CONFIRMED: 'bg-sky-100 text-sky-800',
+    PROCESSING: 'bg-sky-100 text-sky-800',
+    PRINTING: 'bg-primary/15 text-primary',
+    READY_FOR_PICKUP: 'bg-emerald-100 text-emerald-800',
+    COMPLETED: 'bg-stone-200 text-stone-700',
+    COLLECTED: 'bg-stone-200 text-stone-700',
+    CANCELLED: 'bg-red-100 text-red-700',
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'bg-stone-200 text-stone-700';
 }
 
 export function getPaymentStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    PAID: 'bg-green-100 text-green-800',
-    PARTIALLY_PAID: 'bg-yellow-100 text-yellow-800',
-    PENDING: 'bg-orange-100 text-orange-800',
-    REFUNDED: 'bg-red-100 text-red-800',
-    FAILED: 'bg-red-100 text-red-800',
+    PAID: 'bg-emerald-100 text-emerald-800',
+    PARTIALLY_PAID: 'bg-amber-100 text-amber-800',
+    PENDING: 'bg-stone-200 text-stone-700',
+    REFUNDED: 'bg-red-100 text-red-700',
+    FAILED: 'bg-red-100 text-red-700',
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'bg-stone-200 text-stone-700';
 }

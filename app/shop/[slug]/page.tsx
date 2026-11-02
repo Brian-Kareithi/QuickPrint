@@ -6,6 +6,8 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { applyTheme } from '@/lib/theme';
+import { useAuth } from '@/lib/auth-context';
+import { LogoMark } from '@/components/logo';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
 import { Upload, FileText, X, Printer, Check, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
@@ -14,11 +16,25 @@ import type { Shop, PriceBreakdown } from '@/types';
 const inputClass = "block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 const selectClass = "block w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
+/** Best-effort page count for PDFs (counts page objects). The customer can correct it. */
+async function detectPdfPages(file: File): Promise<number> {
+  if (!file.name.toLowerCase().endsWith('.pdf')) return 1;
+  try {
+    const text = await file.text();
+    const m = text.match(/\/Type\s*\/Page(?![a-zA-Z])/g);
+    return m && m.length > 0 ? m.length : 1;
+  } catch {
+    return 1;
+  }
+}
+
 export default function CustomerPortal() {
   const { slug } = useParams();
+  const { user } = useAuth();
   const [shop, setShop] = useState<Shop | null>(null);
   const [files, setFiles] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
   const [orderForm, setOrderForm] = useState({
     customerName: '', customerEmail: '', customerPhone: '',
     paymentMethod: 'CASH_ON_PICKUP',
@@ -32,6 +48,12 @@ export default function CustomerPortal() {
   const [page, setPage] = useState<'upload' | 'options' | 'review' | 'done'>('upload');
 
   useEffect(() => {
+    if (user?.role === 'CUSTOMER') {
+      setOrderForm((f) => ({ ...f, customerName: f.customerName || user.name, customerEmail: f.customerEmail || user.email, customerPhone: f.customerPhone || user.phone || '' }));
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (slug) {
       api.shops.bySlug(slug as string).then((s) => {
         setShop(s);
@@ -43,20 +65,21 @@ export default function CustomerPortal() {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!shop) return;
     setUploading(true);
+    setError('');
     for (const file of acceptedFiles) {
       try {
-        const upload = await api.uploads.upload(shop.id, file);
+        const [upload, pageCount] = await Promise.all([api.uploads.upload(shop.id, file), detectPdfPages(file)]);
         setFiles((prev) => [...prev, { ...upload, progress: 100 }]);
         setPrintOptions((prev) => ({
           ...prev,
           [upload.id]: {
-            fileName: upload.originalName, pageCount: 0, copies: 1,
+            fileName: upload.originalName, pageCount, copies: 1,
             colorMode: 'BLACK_WHITE', paperSize: 'A4', layout: 'SINGLE_SIDED',
             printQuality: 'STANDARD', bindingType: 'NONE', finishingType: 'NONE',
           },
         }));
-      } catch (err) {
-        console.error('Upload failed:', err);
+      } catch (err: any) {
+        setError(`${file.name}: ${err.message || 'Upload failed'}`);
       }
     }
     setUploading(false);
@@ -94,9 +117,14 @@ export default function CustomerPortal() {
       bindingType: printOptions[f.id]?.bindingType || 'NONE',
       finishingType: printOptions[f.id]?.finishingType || 'NONE',
     }));
-    const price = await api.pricing.calculate(shop.id, items);
-    setPricing(price);
-    setPage('review');
+    setError('');
+    try {
+      const price = await api.pricing.calculate(shop.id, items);
+      setPricing(price);
+      setPage('review');
+    } catch (err: any) {
+      setError(err.message || 'Could not calculate the price');
+    }
   };
 
   const createOrder = async () => {
@@ -131,11 +159,14 @@ export default function CustomerPortal() {
 
       setPage('done');
     } catch (err: any) {
-      alert(err.message);
+      setError(err.message || 'Could not place the order');
     } finally {
       setCreatingOrder(false);
     }
   };
+
+  const firstDelete = files.find((f) => f.deleteAfter)?.deleteAfter;
+  const retentionLabel = firstDelete ? getTimeRemaining(firstDelete) : '1 hour';
 
   if (!shop) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -169,7 +200,7 @@ export default function CustomerPortal() {
           {paymentResult && (
             <div className="bg-blue-50 border border-blue-100 text-blue-700 text-xs p-3 rounded-lg">{paymentResult.message}</div>
           )}
-          <p className="text-[11px] text-foreground/50">Files are automatically deleted after 2 hours</p>
+          <p className="text-[11px] text-foreground/50">For your security, your files are permanently deleted from our servers about {retentionLabel} after upload.</p>
         </div>
       </div>
     );
@@ -177,9 +208,12 @@ export default function CustomerPortal() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+      <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
+      <div className="qp-shop max-w-lg mx-auto px-4 py-6 space-y-6">
         <div className="text-center mb-2">
-          {shop.branding?.logoUrl && <img src={shop.branding.logoUrl} alt="" className="h-12 w-12 rounded-xl mx-auto mb-3" />}
+          {shop.branding?.logoUrl
+            ? <img src={shop.branding.logoUrl} alt="" className="h-12 w-12 rounded-xl mx-auto mb-3 object-cover" />
+            : <LogoMark className="h-12 w-12 mx-auto mb-3" />}
           <h1 className="text-lg font-semibold tracking-tight" style={{ color: shop.branding?.primaryColor }}>{shop.name}</h1>
           <p className="text-sm text-foreground/60">{shop.welcomeMessage || 'Upload your documents for printing'}</p>
         </div>
@@ -190,6 +224,10 @@ export default function CustomerPortal() {
           ))}
         </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>
+        )}
+
         {page === 'upload' && (
           <div className="space-y-4">
             <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-primary/5' : 'border-foreground/20 hover:border-primary/40'}`}>
@@ -197,6 +235,7 @@ export default function CustomerPortal() {
               <Upload className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
               <p className="text-sm font-medium">Drop files here or click to browse</p>
               <p className="text-xs text-foreground/50 mt-1">PDF, DOC, DOCX, PPT, XLS, JPG, PNG, ZIP</p>
+              <p className="text-[11px] text-foreground/40 mt-1">Your files go straight to {shop.name} and are deleted automatically after 1 hour.</p>
               {uploading && <Loader2 className="h-5 w-5 animate-spin mx-auto mt-4 text-primary" />}
             </div>
 
@@ -219,7 +258,7 @@ export default function CustomerPortal() {
                     </button>
                   </div>
                 ))}
-                <Button className="w-full" size="lg" onClick={calculatePrice}>
+                <Button className="w-full" size="lg" onClick={() => setPage('options')} disabled={uploading}>
                   Continue ({files.length} file{files.length > 1 ? 's' : ''})
                 </Button>
               </div>
@@ -258,6 +297,12 @@ export default function CustomerPortal() {
                       </div>
                     ))}
                     <div>
+                      <label className="text-xs text-foreground/60 block mb-1.5">Pages in document</label>
+                      <input type="number" min="1" value={opts.pageCount || 1}
+                        onChange={(e) => updateOption(file.id, 'pageCount', parseInt(e.target.value) || 1)}
+                        className={inputClass} />
+                    </div>
+                    <div>
                       <label className="text-xs text-foreground/60 block mb-1.5">Copies</label>
                       <input type="number" min="1" value={opts.copies || 1}
                         onChange={(e) => updateOption(file.id, 'copies', parseInt(e.target.value) || 1)}
@@ -269,7 +314,7 @@ export default function CustomerPortal() {
             })}
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setPage('upload')} className="flex-1">Back</Button>
-              <Button className="flex-[2]" onClick={() => setPage('review')}>Review order</Button>
+              <Button className="flex-[2]" onClick={calculatePrice}>Review order</Button>
             </div>
           </div>
         )}

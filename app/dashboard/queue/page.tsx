@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
+import { PrintFileButton } from '@/components/print-file-button';
 import { Button } from '@/components/ui/button';
 import { formatDateTime, getStatusColor, formatFileSize } from '@/lib/utils';
 import { Loader2, Play, CheckCircle, XCircle, Clock, Printer, Package, RefreshCw } from 'lucide-react';
@@ -13,6 +14,7 @@ export default function QueuePage() {
   const [loading, setLoading] = useState(true);
 
   const loadQueue = async () => {
+    try {
     const shops = await api.shops.mine();
     if (shops.length > 0) {
       const shopId = shops[0].id;
@@ -23,10 +25,16 @@ export default function QueuePage() {
       setQueue(q);
       setReady(r);
     }
-    setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { loadQueue(); }, []);
+  useEffect(() => {
+    loadQueue();
+    const t = setInterval(loadQueue, 15000); // pick up new customer orders
+    return () => clearInterval(t);
+  }, []);
 
   const updateStatus = async (id: string, status: string) => {
     await api.orders.updateStatus(id, status);
@@ -54,6 +62,8 @@ export default function QueuePage() {
             <span className="flex-shrink-0">&middot; {item.copies}x</span>
             <span className="flex-shrink-0">&middot; {item.colorMode === 'FULL_COLOR' ? 'Color' : 'B&W'}</span>
             <span className="flex-shrink-0">&middot; {item.pageCount}pgs</span>
+            <span className="flex-1" />
+            <PrintFileButton item={item} />
           </div>
         ))}
       </div>

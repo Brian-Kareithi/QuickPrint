@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Printer } from 'lucide-react';
+import { LogoMark } from '@/components/logo';
+import { homeFor } from '@/lib/roles';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,8 +20,8 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
-      router.push('/dashboard');
+      const user = await login(email, password);
+      router.push(homeFor(user));
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -29,16 +30,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-            <Printer className="h-5 w-5 text-white" />
-          </div>
+          <LogoMark className="h-12 w-12 mx-auto mb-4 drop-shadow-sm" />
           <h1 className="text-xl font-semibold tracking-tight">Welcome back</h1>
           <p className="text-sm text-foreground/60 mt-1">Sign in to your account</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-card rounded-xl border shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="page-enter bg-card/90 backdrop-blur rounded-2xl border shadow-xl shadow-black/5 p-7 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-lg">{error}</div>
           )}

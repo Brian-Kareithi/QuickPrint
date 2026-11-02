@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { api, getAppUrl } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Loader2, Download, Printer } from 'lucide-react';
 
@@ -18,14 +18,14 @@ export default function QRCodePage() {
         const qr = await api.qrcode.get(s.slug);
         setQrData(qr);
       }
-      setLoading(false);
-    });
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
   if (!shop || !qrData) return <p className="text-center py-12 text-sm text-foreground/60">No shop found</p>;
 
-  const customerUrl = typeof window !== 'undefined' ? `${window.location.origin}/shop/${shop.slug}` : '';
+  const customerUrl = qrData.url || `${getAppUrl()}/shop/${shop.slug}`;
+  const isLocalhost = /localhost|127.0.0.1/.test(customerUrl);
 
   return (
     <div className="max-w-md mx-auto space-y-6">
@@ -35,6 +35,12 @@ export default function QRCodePage() {
           <p className="text-sm font-medium mb-1">{shop.name}</p>
           <p className="text-xs text-foreground/60 break-all">{customerUrl}</p>
         </div>
+        {isLocalhost && (
+          <p className="text-xs text-orange-700 bg-orange-50 border border-orange-100 rounded-lg p-3 text-left">
+            This QR code points to <b>localhost</b>, which customers&apos; phones cannot open. Set <code>NEXT_PUBLIC_APP_URL</code> to your
+            public or network address (e.g. https://quickprint.example.com) and restart the app before printing it.
+          </p>
+        )}
         <div className="mx-auto w-64 h-64 bg-white rounded-xl border p-3 shadow-sm">
           <img src={qrData.qrDataUrl} alt="QR Code" className="w-full h-full" />
         </div>
@@ -58,7 +64,7 @@ export default function QRCodePage() {
             <Download className="h-3.5 w-3.5 mr-1.5" /> SVG
           </Button>
         </div>
-        <Button variant="secondary" onClick={() => window.open(api.qrcode.download(shop.slug), '_blank')}>
+        <Button variant="secondary" onClick={() => window.open(api.qrcode.poster(shop.slug), '_blank')}>
           <Printer className="h-3.5 w-3.5 mr-1.5" /> Print poster
         </Button>
       </div>
