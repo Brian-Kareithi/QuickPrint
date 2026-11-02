@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import { SiteFooter } from '@/components/site-footer';
+import { ThemeSync } from '@/components/theme-sync';
+import { THEME_INIT_SCRIPT } from '@/lib/portal-theme';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+const display = Instrument_Serif({ variable: '--font-instrument', subsets: ['latin'], weight: '400', style: ['normal', 'italic'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -14,17 +17,16 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#003249' };
 
-const THEME_INIT = "try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/* Apply the saved theme before first paint so there is no light flash */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <AuthProvider>
+          <ThemeSync />
           {children}
           <SiteFooter />
         </AuthProvider>

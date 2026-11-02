@@ -24,6 +24,7 @@
   --color-panel: var(--panel);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-instrument), Georgia, serif;
   --radius: 1rem;
 }
 
@@ -122,12 +123,14 @@ button:not(:disabled):active { transform: scale(0.98); }
 }
 
 /* Self-contained light surface (shop storefront, branding preview): shop colours are chosen for a light page, so it stays light in dark mode */
-.light {
-  --background: #eef3f5; --foreground: #003249; --card: #ffffff; --muted: #e8f0f1; --muted-foreground: #5f7b87;
-  --accent: #dcebed; --border: #e1eaec; --input: #cddcdf; --primary: #007ea7; --primary-foreground: #ffffff;
+.light, .light-brand {
+  --foreground: #003249; --card: #ffffff; --muted: #e8f0f1; --muted-foreground: #5f7b87;
+  --accent: #dcebed; --border: #e1eaec; --input: #cddcdf; --primary-foreground: #ffffff;
   --ink: #003249; --panel: #003249; color-scheme: light; color: var(--foreground);
 }
-.light {
+/* .light-brand leaves --primary / --background alone so a shop's own branding still applies */
+.light { --background: #eef3f5; --primary: #007ea7; --secondary: #003249; }
+.light, .light-brand {
   --color-red-50: #fef2f2; --color-red-100: #fee2e2; --color-red-600: #dc2626; --color-red-700: #b91c1c;
   --color-amber-50: #fffbeb; --color-amber-100: #fef3c7; --color-amber-200: #fde68a; --color-amber-700: #b45309; --color-amber-800: #92400e; --color-amber-900: #78350f;
   --color-emerald-50: #ecfdf5; --color-emerald-100: #d1fae5; --color-emerald-200: #a7f3d0; --color-emerald-800: #065f46;

@@ -198,7 +198,7 @@ export default function CustomerPortal() {
 
   if (page === 'done' && orderResult) {
     return (
-      <div className="light min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+      <div className="light-brand min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
         <div className="max-w-sm w-full text-center space-y-6 bg-card rounded-xl p-8 shadow-lg border">
           <div className="h-14 w-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
             <Check className="h-7 w-7 text-green-600" />
@@ -227,7 +227,7 @@ export default function CustomerPortal() {
   }
 
   return (
-    <div className="light min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+    <div className="light-brand min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
       <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
       <div className="qp-shop max-w-lg mx-auto px-4 py-6 space-y-6">
         <div className="text-center mb-2">
