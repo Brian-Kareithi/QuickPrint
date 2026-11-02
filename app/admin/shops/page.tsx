@@ -1,11 +1,14 @@
 'use client';
 
+import { Skeleton, ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils';
-import { Loader2, Search, ChevronDown, UserRoundCog, Check } from 'lucide-react';
+import { Search, ChevronDown, UserRoundCog, Check } from 'lucide-react';
 
 type Filter = '' | 'active' | 'suspended';
 
@@ -21,7 +24,7 @@ function OwnerPicker({ shop, onDone, onCancel }: { shop: any; onDone: (updated: 
     const t = setTimeout(() => {
       api.admin.users({ role: 'OWNER', q, limit: 20 })
         .then((d) => setOwners(d.users.filter((u: any) => u.id !== shop.ownerId && !u.isSuspended)))
-        .catch((e) => setError(e.message));
+        .catch((e) => { setError(e.message); setOwners([]); });
     }, 250);
     return () => clearTimeout(t);
   }, [q, shop.ownerId]);
@@ -54,13 +57,13 @@ function OwnerPicker({ shop, onDone, onCancel }: { shop: any; onDone: (updated: 
 
       <div className="max-h-56 overflow-y-auto rounded-xl border divide-y">
         {!owners ? (
-          <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-primary" /></div>
+          <div className="p-3 space-y-2"><Skeleton className="h-9 w-full" /><Skeleton className="h-9 w-full" /><Skeleton className="h-9 w-full" /></div>
         ) : owners.length === 0 ? (
           <p className="text-xs text-foreground/50 text-center py-6">No other shop owners found</p>
         ) : owners.map((o) => (
           <button key={o.id} type="button" onClick={() => setPicked(o)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${picked?.id === o.id ? 'bg-primary/10' : 'hover:bg-muted/50'}`}>
-            <span className="h-8 w-8 rounded-full bg-[#9ad1d4]/50 text-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">{o.name.charAt(0).toUpperCase()}</span>
+            <span className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-semibold flex-shrink-0">{o.name.charAt(0).toUpperCase()}</span>
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-medium truncate">{o.name}</span>
               <span className="block text-xs text-foreground/60 truncate">{o.email}{o.ownedShops?.length ? ` · owns ${o.ownedShops.length} shop${o.ownedShops.length > 1 ? 's' : ''}` : ''}</span>
@@ -129,9 +132,9 @@ export default function AdminShops() {
 
       <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <ListSkeleton bare rows={5} />
         ) : shops.length === 0 ? (
-          <p className="p-12 text-center text-sm text-foreground/50">No shops found</p>
+          error ? <ErrorState compact message={error} onRetry={() => { setLoading(true); setError(''); load(filter); }} /> : <p className="p-12 text-center text-sm text-foreground/50">No shops found</p>
         ) : shops.map((shop) => (
           <div key={shop.id} className="border-b last:border-0">
             <div className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-muted/20 transition-colors">

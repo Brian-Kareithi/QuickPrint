@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Upload, ListChecks, Wallet } from 'lucide-react';
 
 const POINTS = [
@@ -36,7 +35,6 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
       </aside>
 
       <main className="relative flex-1 flex flex-col items-center justify-center px-1 py-6">
-        <ThemeToggle className="absolute top-1 right-1" />
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex justify-center mb-8"><Logo /></div>
           <div className="mb-6 text-center lg:text-left">

@@ -6,7 +6,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
-  --color-primary-foreground: #ffffff;
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: #ffffff;
   --color-muted: var(--muted);
@@ -38,6 +38,7 @@
   --border: #e1eaec;
   --input: #cddcdf;
   --primary: #007ea7;
+  --primary-foreground: #ffffff;
   --secondary: #003249;
   --ink: #003249;   /* strong fills: active nav pill, main buttons */
   --panel: #003249; /* decorative dark panels */
@@ -46,18 +47,20 @@
 }
 
 .dark {
-  --background: #0a171e;
-  --foreground: #e3eef2;
-  --card: #112530;
-  --muted: #183341;
-  --muted-foreground: #8fb0bd;
-  --accent: #1d3d4c;
-  --border: #1f3b49;
-  --input: #2b4b5a;
-  --primary: #22a7d4;
-  --secondary: #1d3d4c;
-  --ink: #0b7ea5;
-  --panel: #0f3447;
+  /* True black page. Layers get lighter as they come forward: page < card < raised/muted < hover (accent) */
+  --background: #000000;
+  --foreground: #eef3f5;
+  --card: #0a0d0f;
+  --muted: #13181b;
+  --muted-foreground: #8f9fa7;
+  --accent: #1b2327;
+  --border: #20282d;
+  --input: #2d373d;
+  --primary: #38b9e3;
+  --primary-foreground: #04222d; /* dark text on the lighter dark-mode primary */
+  --secondary: #1b2327;
+  --ink: #0a7aa1;   /* strong fills keep white text readable */
+  --panel: #06222e;
   color-scheme: dark;
 
   /* Remap the tailwind status colours used for alerts and badges */
@@ -68,15 +71,12 @@
   --color-yellow-100: #46390f; --color-yellow-800: #fde047;
   --color-orange-50: #38230f; --color-orange-200: #5c3a18; --color-orange-600: #fb923c; --color-orange-800: #fdba74;
   --color-blue-100: #17304d; --color-blue-800: #93c5fd;
-  --color-stone-200: #284049; --color-stone-700: #cfdde2;
+  --color-stone-200: #2a3237; --color-stone-700: #d3dde1;
 }
 
 html { font-size: 15px; -webkit-text-size-adjust: 100%; }
-body { overflow-x: hidden; }
+body { overflow-x: hidden; padding-bottom: 2.75rem; } /* room for the floating credit pill */
 @media (max-width: 640px) {
-  /* Full-screen pages leave room for the 2.75rem footer so it sits on screen without scrolling */
-.min-h-screen { min-height: calc(100vh - 2.75rem); }
-
 html { font-size: 14px; }
   /* 16px inputs stop iOS zooming on focus */
   input, select, textarea { font-size: 16px !important; }
@@ -120,6 +120,26 @@ button:not(:disabled):active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Self-contained light surface (shop storefront, branding preview): shop colours are chosen for a light page, so it stays light in dark mode */
+.light {
+  --background: #eef3f5; --foreground: #003249; --card: #ffffff; --muted: #e8f0f1; --muted-foreground: #5f7b87;
+  --accent: #dcebed; --border: #e1eaec; --input: #cddcdf; --primary: #007ea7; --primary-foreground: #ffffff;
+  --ink: #003249; --panel: #003249; color-scheme: light; color: var(--foreground);
+}
+.light {
+  --color-red-50: #fef2f2; --color-red-100: #fee2e2; --color-red-600: #dc2626; --color-red-700: #b91c1c;
+  --color-amber-50: #fffbeb; --color-amber-100: #fef3c7; --color-amber-200: #fde68a; --color-amber-700: #b45309; --color-amber-800: #92400e; --color-amber-900: #78350f;
+  --color-emerald-50: #ecfdf5; --color-emerald-100: #d1fae5; --color-emerald-200: #a7f3d0; --color-emerald-800: #065f46;
+  --color-green-50: #f0fdf4; --color-green-100: #dcfce7; --color-green-600: #16a34a; --color-green-800: #166534;
+  --color-yellow-100: #fef9c3; --color-yellow-800: #854d0e;
+  --color-orange-50: #fff7ed; --color-orange-200: #fed7aa; --color-orange-600: #ea580c; --color-orange-800: #9a3412;
+  --color-blue-100: #dbeafe; --color-blue-800: #1e40af;
+  --color-stone-200: #e7e5e4; --color-stone-700: #44403c;
+}
+
+/* Chart axis labels follow the theme */
+.recharts-text, .recharts-cartesian-axis-tick-value { fill: var(--muted-foreground); }
 
 /* Theme switch: the new theme grows out of the toggle button as a circle (see components/theme-toggle.tsx) */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }

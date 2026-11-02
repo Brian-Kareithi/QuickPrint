@@ -1,5 +1,8 @@
 'use client';
 
+import { Skeleton, ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { Fragment, useState, useEffect, useMemo } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +11,7 @@ import { PrintFileButton } from '@/components/print-file-button';
 import { MarkPaidButton } from '@/components/mark-paid-button';
 import { downloadCsv } from '@/lib/csv';
 import { formatCurrency, formatDateTime, getStatusColor, getPaymentStatusColor } from '@/lib/utils';
-import { Loader2, Search, Download } from 'lucide-react';
+import { Search, Download } from 'lucide-react';
 
 const STATUS_FILTERS = [
   { value: '', label: 'All' },
@@ -76,7 +79,13 @@ export default function OrdersPage() {
     ]);
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return (
+    <div className="space-y-4">
+      <Skeleton className="h-10 w-64" />
+      <ListSkeleton rows={6} avatar={false} />
+    </div>
+  );
+  if (error && orders.length === 0) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
   const chip = (active: boolean, label: string, onClick: () => void) => (
     <button key={label} onClick={onClick}
@@ -145,7 +154,7 @@ export default function OrdersPage() {
                   <div key={item.id} className="rounded-xl bg-muted/60 p-3 text-xs space-y-2">
                     <p className="font-medium truncate">{item.fileName}</p>
                     <p className="text-foreground/60">{item.copies}x · {item.colorMode === 'FULL_COLOR' ? 'Color' : 'B&W'} · {item.paperSize} · {item.pageCount}pgs</p>
-                    <PrintFileButton item={item} />
+                    <PrintFileButton item={item} order={order} />
                   </div>
                 ))}
               </div>
@@ -195,7 +204,7 @@ export default function OrdersPage() {
                             <span>&middot; {item.paperSize}</span>
                             <span>&middot; {item.pageCount}pgs</span>
                             <span className="flex-1" />
-                            <PrintFileButton item={item} />
+                            <PrintFileButton item={item} order={order} />
                           </div>
                         ))}
                       </td>

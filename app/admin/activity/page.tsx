@@ -1,9 +1,12 @@
 'use client';
 
+import { ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
-import { Loader2, ScrollText } from 'lucide-react';
+import { ScrollText } from 'lucide-react';
 
 const describe = (log: any): string => {
   const m = log.metadata || {};
@@ -26,8 +29,8 @@ export default function AdminActivity() {
     api.admin.activity().then(setData).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>;
-  if (!data) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
+  if (!data) return <ListSkeleton rows={6} />;
 
   return (
     <div className="max-w-3xl space-y-3">

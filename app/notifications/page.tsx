@@ -1,18 +1,22 @@
 'use client';
 
+import { ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { RoleShell } from '@/components/role-shell';
 import { formatDateTime } from '@/lib/utils';
-import { Bell, Loader2, CheckCheck } from 'lucide-react';
+import { Bell, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    api.notifications.list().then(setNotifications).catch(() => {}).finally(() => setLoading(false));
+    api.notifications.list().then(setNotifications).catch((e) => setError(e.message || 'Could not load notifications')).finally(() => setLoading(false));
   }, []);
 
   const markRead = async (id: string) => {
@@ -42,7 +46,9 @@ export default function NotificationsPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <ListSkeleton rows={5} avatar={false} />
+        ) : error ? (
+          <ErrorState compact message={error} onRetry={() => window.location.reload()} />
         ) : notifications.length === 0 ? (
           <div className="bg-card rounded-2xl border text-center py-16">
             <Bell className="h-8 w-8 text-foreground/20 mx-auto mb-3" />

@@ -1,16 +1,20 @@
 'use client';
 
+import { FormSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 export default function PricingPage() {
   const [shop, setShop] = useState<any>(null);
   const [pricing, setPricing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api.shops.mine().then(async (shops) => {
@@ -19,22 +23,31 @@ export default function PricingPage() {
         setShop(s);
         setPricing(s.pricing);
       }
-      setLoading(false);
-    });
+    }).catch((e) => setError(e.message || 'Could not load your pricing')).finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
     if (!shop) return;
     setSaving(true);
-    await api.shops.updatePricing(shop.id, pricing);
-    setSaving(false);
+    try {
+      await api.shops.updatePricing(shop.id, pricing);
+    } catch (e: any) {
+      alert(e.message || 'Could not save your pricing');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updatePrice = (key: string, value: string) => {
     setPricing({ ...pricing, [key]: parseFloat(value) || 0 });
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <FormSkeleton fields={6} />;
+  if (error || !pricing) {
+    return error
+      ? <ErrorState message={error} onRetry={() => window.location.reload()} />
+      : <p className="text-center py-12 text-sm text-foreground/60">Create your business first.</p>;
+  }
 
   const sections = [
     { title: 'Printing', keys: ['bwPagePrice', 'colorPagePrice'] },

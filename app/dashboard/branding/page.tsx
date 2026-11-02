@@ -1,10 +1,13 @@
 'use client';
 
+import { FormSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { LogoMark } from '@/components/logo';
 
 const COLORS = [
@@ -27,7 +30,7 @@ export default function BrandingPage() {
         setShop(s);
         setBranding(s.branding || { primaryColor: '#2563eb', secondaryColor: '#1e40af', backgroundColor: '#ffffff', buttonStyle: 'rounded', backgroundStyle: 'solid' });
       }
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch((e) => setError(e.message || 'Could not load your branding')).finally(() => setLoading(false));
   }, []);
 
   const updateColor = (key: string, value: string) => setBranding({ ...branding, [key]: value });
@@ -48,7 +51,8 @@ export default function BrandingPage() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <FormSkeleton fields={5} />;
+  if (error && !shop) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="grid lg:grid-cols-2 gap-8">
@@ -119,7 +123,7 @@ export default function BrandingPage() {
 
       <div className="space-y-6">
         <h2 className="text-lg font-semibold">Preview</h2>
-        <div className="bg-card rounded-xl border shadow-sm overflow-hidden" style={{ backgroundColor: branding?.backgroundColor || '#ffffff' }}>
+        <div className="light bg-card rounded-xl border shadow-sm overflow-hidden" style={{ backgroundColor: branding?.backgroundColor || '#ffffff' }}>
           <div className="p-6">
             <div className="rounded-xl border bg-white p-6">
               <div className="flex items-center gap-3 mb-4">

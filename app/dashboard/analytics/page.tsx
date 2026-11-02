@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { ChartsSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { Loader2, TrendingUp, BarChart3, TrendingDown } from 'lucide-react';
+import { TrendingUp, BarChart3, TrendingDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
-const COLORS = ['#2563eb', '#1e40af', '#3b82f6', '#60a5fa', '#93c5fd'];
+const COLORS = ['#2563eb', '#0ea5e9', '#3b82f6', '#60a5fa', '#93c5fd'];
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<any>(null);
@@ -15,25 +18,35 @@ export default function AnalyticsPage() {
   const [hoursData, setHoursData] = useState<any[]>([]);
   const [printerData, setPrinterData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    (async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
       const shops = await api.shops.mine();
-      if (shops.length === 0) { setLoading(false); return; }
-      const shopId = shops[0].id;
-      const [s, r, o, h, p] = await Promise.all([
-        api.analytics.dashboard(shopId),
-        api.analytics.revenue(shopId),
-        api.analytics.orders(shopId),
-        api.analytics.hours(shopId),
-        api.analytics.printer(shopId),
-      ]);
-      setStats(s); setRevenueData(r); setOrdersData(o); setHoursData(h); setPrinterData(p);
+      if (shops.length > 0) {
+        const shopId = shops[0].id;
+        const [s, r, o, h, p] = await Promise.all([
+          api.analytics.dashboard(shopId),
+          api.analytics.revenue(shopId),
+          api.analytics.orders(shopId),
+          api.analytics.hours(shopId),
+          api.analytics.printer(shopId),
+        ]);
+        setStats(s); setRevenueData(r); setOrdersData(o); setHoursData(h); setPrinterData(p);
+      }
+    } catch (e: any) {
+      setError(e.message || 'Could not load your analytics');
+    } finally {
       setLoading(false);
-    })();
+    }
   }, []);
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  useEffect(() => { load(); }, [load]);
+
+  if (loading) return <ChartsSkeleton />;
+  if (error) return <ErrorState message={error} onRetry={load} />;
 
   const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="bg-card rounded-xl border shadow-sm">
@@ -68,7 +81,7 @@ export default function AnalyticsPage() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.922 0 0)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#8fb0bd33" />
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
                 <YAxis tick={{ fontSize: 10 }} tickLine={false} />
                 <Tooltip />
@@ -82,7 +95,7 @@ export default function AnalyticsPage() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ordersData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.922 0 0)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#8fb0bd33" />
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
                 <YAxis tick={{ fontSize: 10 }} tickLine={false} />
                 <Tooltip />
@@ -96,11 +109,11 @@ export default function AnalyticsPage() {
           <div className="h-60">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hoursData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.922 0 0)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#8fb0bd33" />
                 <XAxis dataKey="hour" tick={{ fontSize: 10 }} tickLine={false} tickFormatter={(h) => `${h}:00`} />
                 <YAxis tick={{ fontSize: 10 }} tickLine={false} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#1e40af" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="count" fill="#0ea5e9" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -128,7 +141,7 @@ export default function AnalyticsPage() {
               <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: '#2563eb' }} /> B&W: {printerData?.bwPages || 0}
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: '#1e40af' }} /> Color: {printerData?.colorPages || 0}
+              <div className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: '#0ea5e9' }} /> Color: {printerData?.colorPages || 0}
             </div>
           </div>
         </ChartCard>

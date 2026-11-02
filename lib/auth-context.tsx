@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { api } from './api';
 import type { User } from '@/types';
 
@@ -8,6 +8,9 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  /** Set when the session check failed because the server could not be reached (not a bad login). */
+  authError: string;
+  retryAuth: () => void;
   login: (email: string, password: string) => Promise<User>;
   register: (data: { email: string; password: string; name: string; phone?: string; accountType?: 'CUSTOMER' | 'OWNER' }) => Promise<User>;
   logout: () => void;
@@ -25,25 +28,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
 
-  useEffect(() => {
+  const checkSession = useCallback(() => {
     const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      api.auth.me()
-        .then(setUser)
-        .catch(() => { localStorage.removeItem('token'); })
-        .finally(() => setLoading(false));
-    } else {
+    if (!storedToken) {
       setLoading(false);
+      return;
     }
+    setToken(storedToken);
+    setLoading(true);
+    setAuthError('');
+    api.auth.me()
+      .then(setUser)
+      .catch((err) => {
+        // Only an invalid/expired login signs the user out. A network problem keeps the session
+        // and shows a retry instead of bouncing the user to the login page.
+        if (err?.status === 401 || err?.status === 403) {
+          localStorage.removeItem('token');
+          setToken(null);
+        } else {
+          setAuthError(err?.message || "Can't reach the server. Please try again.");
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { checkSession(); }, [checkSession]);
 
   const login = async (email: string, password: string) => {
     const res = await api.auth.login(email, password);
     localStorage.setItem('token', res.token);
     setToken(res.token);
     setUser(res.user);
+    setAuthError('');
     return res.user as User;
   };
 
@@ -52,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', res.token);
     setToken(res.token);
     setUser(res.user);
+    setAuthError('');
     return res.user as User;
   };
 
@@ -64,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    setAuthError('');
   };
 
   return (
@@ -72,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         token,
         loading,
+        authError,
+        retryAuth: checkSession,
         login,
         register,
         logout,

@@ -1,11 +1,14 @@
 'use client';
 
+import { FormSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { PaymentFields, paymentFromShop, emptyPayment, type PaymentValues } from '@/components/payment-fields';
 import { paymentInstructions, paymentOptions } from '@/lib/payments';
-import { Loader2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import type { Shop } from '@/types';
 
 export default function PaymentsPage() {
@@ -42,7 +45,8 @@ export default function PaymentsPage() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <FormSkeleton fields={5} />;
+  if (error && !shop) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
   if (!shop) return <p className="text-center py-12 text-sm text-foreground/60">Create your business first.</p>;
 
   const preview = { ...shop, ...payment } as Shop;

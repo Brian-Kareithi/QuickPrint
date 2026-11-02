@@ -1,8 +1,10 @@
 'use client';
 
+import { ListSkeleton, ShellSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
 import { navFor } from '@/lib/nav';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -16,16 +18,17 @@ export default function MyOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [busy, setBusy] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (loading) return;
     if (!isAuthenticated) router.push('/auth/login');
     else if (user && user.role !== 'CUSTOMER') router.replace(homeFor(user));
-    else api.orders.mine().then(setOrders).catch(() => {}).finally(() => setBusy(false));
+    else api.orders.mine().then(setOrders).catch((e) => setError(e.message || 'Could not load your orders')).finally(() => setBusy(false));
   }, [loading, isAuthenticated, user, router]);
 
   if (loading || !user || user.role !== 'CUSTOMER') {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+    return <ShellSkeleton />;
   }
 
   return (
@@ -39,7 +42,9 @@ export default function MyOrdersPage() {
       <div className="max-w-2xl space-y-4">
         <p className="text-sm text-foreground/60">To print something, scan the QR code at the shop. Your orders will show up here when you&apos;re signed in.</p>
         {busy ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <ListSkeleton rows={3} avatar={false} />
+        ) : error ? (
+          <ErrorState compact message={error} onRetry={() => window.location.reload()} />
         ) : orders.length === 0 ? (
           <div className="bg-card rounded-2xl border p-12 text-center text-sm text-foreground/50">No orders yet</div>
         ) : orders.map((o) => (

@@ -1,15 +1,19 @@
 'use client';
 
+import { Skeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api, getAppUrl } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Loader2, Download, Printer, Copy, Check, ExternalLink } from 'lucide-react';
+import { Download, Printer, Copy, Check, ExternalLink } from 'lucide-react';
 
 export default function QRCodePage() {
   const [shop, setShop] = useState<any>(null);
   const [qrData, setQrData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api.shops.mine().then(async (shops) => {
@@ -18,10 +22,20 @@ export default function QRCodePage() {
         setShop(s);
         setQrData(await api.qrcode.get(s.slug));
       }
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch((e) => setError(e.message || 'Could not load your QR code')).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return (
+    <div className="grid lg:grid-cols-5 gap-5 max-w-4xl">
+      <div className="lg:col-span-3 space-y-4">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-32 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
+      </div>
+      <Skeleton className="lg:col-span-2 h-80 rounded-2xl" />
+    </div>
+  );
+  if (error && !shop) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
   if (!shop || !qrData) return <p className="text-center py-12 text-sm text-foreground/60">Create your business first.</p>;
 
   const customerUrl: string = qrData.url || `${getAppUrl()}/shop/${shop.slug}`;

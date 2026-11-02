@@ -1,9 +1,12 @@
 'use client';
 
+import { Skeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { formatDateTime, formatFileSize } from '@/lib/utils';
-import { Loader2, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 export default function AdminSystem() {
   const [health, setHealth] = useState<any>(null);
@@ -16,8 +19,13 @@ export default function AdminSystem() {
       .catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>;
-  if (!health) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
+  if (!health) return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      <Skeleton className="h-64 rounded-2xl" />
+      <Skeleton className="h-64 rounded-2xl" />
+    </div>
+  );
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
@@ -25,10 +33,11 @@ export default function AdminSystem() {
         <div className="px-6 py-4 border-b"><h3 className="text-sm font-semibold">Document deletion compliance</h3></div>
         <div className="p-6 space-y-3">
           {[
-            ['Total uploads', retention?.totalUploads],
-            ['Deleted', retention?.deletedUploads],
-            ['Pending deletion', retention?.pendingDeletion],
-            ['Compliance rate', retention?.complianceRate],
+            ['Files stored right now', retention?.activeFiles],
+            ['Permanently erased (all time)', retention?.purgedTotal],
+            ['Overdue for deletion', retention?.overdue],
+            ['Next scheduled deletion', retention?.nextExpiry ? formatDateTime(retention.nextExpiry) : 'None'],
+            ['Status', retention?.compliant ? 'On schedule' : 'Behind schedule'],
           ].map(([l, v]) => (
             <div key={l as string} className="flex justify-between text-sm py-2 border-b border-border/50 last:border-0">
               <span className="text-foreground/60">{l}</span><span className="font-medium">{v}</span>

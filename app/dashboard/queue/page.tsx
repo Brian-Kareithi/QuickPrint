@@ -1,5 +1,7 @@
 'use client';
 
+import { QueueSkeleton } from '@/components/skeleton';
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +10,7 @@ import { MarkPaidButton } from '@/components/mark-paid-button';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, getStatusColor } from '@/lib/utils';
 import {
-  Loader2, Play, CheckCircle, XCircle, Clock, Printer, Package, RefreshCw, Search, Volume2, VolumeX, Phone,
+  Play, CheckCircle, XCircle, Clock, Printer, Package, RefreshCw, Search, Volume2, VolumeX, Phone,
 } from 'lucide-react';
 
 type Action = { icon: any; label: string; status: string; variant?: any; confirm?: string };
@@ -53,7 +55,7 @@ function OrderCard({ order, actions, onStatus, onPaid }: {
             <span className="flex-shrink-0">&middot; {item.colorMode === 'FULL_COLOR' ? 'Color' : 'B&W'}</span>
             <span className="flex-shrink-0">&middot; {item.pageCount}pgs</span>
             <span className="flex-1" />
-            <PrintFileButton item={item} />
+            <PrintFileButton item={item} order={order} />
           </div>
         ))}
       </div>
@@ -196,7 +198,7 @@ export default function QueuePage() {
       || (o.customerPhone || '').includes(q);
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <QueueSkeleton />;
 
   return (
     <div className="space-y-4">

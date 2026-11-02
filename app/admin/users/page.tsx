@@ -1,12 +1,15 @@
 'use client';
 
+import { ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatDateTime } from '@/lib/utils';
-import { Loader2, Search, ChevronLeft, ChevronRight, Store, ShoppingBag } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Store, ShoppingBag } from 'lucide-react';
 
 const ROLES = [
   { value: '', label: 'All' },
@@ -19,7 +22,7 @@ const ROLE_LABEL: Record<string, string> = { ADMIN: 'Super admin', OWNER: 'Shop 
 const ROLE_STYLE: Record<string, string> = {
   ADMIN: 'bg-ink text-white',
   OWNER: 'bg-primary/15 text-primary',
-  STAFF: 'bg-[#9ad1d4]/50 text-foreground',
+  STAFF: 'bg-primary/15 text-primary',
   CUSTOMER: 'bg-stone-200 text-stone-700',
 };
 
@@ -81,11 +84,11 @@ export default function AdminUsers() {
         <div className="flex gap-2 overflow-x-auto pb-1 -mb-1">{ROLES.map((r) => chip(r.value, r.label))}</div>
       </div>
 
-      {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
+      {error && data && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
 
       <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
         {!data ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          error ? <ErrorState compact message={error} onRetry={load} /> : <ListSkeleton bare rows={6} />
         ) : data.users.length === 0 ? (
           <p className="text-center text-sm text-foreground/50 py-12">No users match your search</p>
         ) : data.users.map((u) => {
@@ -94,7 +97,7 @@ export default function AdminUsers() {
           return (
             <div key={u.id} className="p-4 border-b last:border-0 hover:bg-muted/25 transition-colors flex flex-col lg:flex-row lg:items-center gap-3">
               <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="h-9 w-9 rounded-full bg-[#9ad1d4]/50 text-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                <div className="h-9 w-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-semibold flex-shrink-0">
                   {u.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">

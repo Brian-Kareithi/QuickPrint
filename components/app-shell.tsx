@@ -113,7 +113,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
             <Link href="/notifications" title="Notifications" className="relative p-2 rounded-xl hover:bg-muted transition-colors">
               <Bell className="h-4 w-4" />
               {unread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-white text-[10px] font-semibold flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
                   {unread > 9 ? '9+' : unread}
                 </span>
               )}

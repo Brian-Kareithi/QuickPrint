@@ -1,10 +1,13 @@
 'use client';
 
+import { FormSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 export default function SettingsPage() {
   const [shop, setShop] = useState<any>(null);
@@ -14,20 +17,19 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.shops.mine().then((shops) => {
-      const own = shops;
-      if (own.length > 0) {
-        api.shops.byId(own[0].id).then((s) => {
-          setShop(s);
-          setForm({
-            name: s.name, description: s.description || '', email: s.email || '',
-            phone: s.phone || '', address: s.address || '', welcomeMessage: s.welcomeMessage || '',
-          });
+    api.shops.mine().then(async (shops) => {
+      if (shops.length > 0) {
+        const s = await api.shops.byId(shops[0].id);
+        setShop(s);
+        setForm({
+          name: s.name, description: s.description || '', email: s.email || '',
+          phone: s.phone || '', address: s.address || '', welcomeMessage: s.welcomeMessage || '',
         });
       }
-    });
+    }).catch((e) => setError(e.message || 'Could not load your settings')).finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
@@ -45,7 +47,12 @@ export default function SettingsPage() {
     }
   };
 
-  if (!shop) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <FormSkeleton fields={6} />;
+  if (!shop) {
+    return error
+      ? <ErrorState message={error} onRetry={() => window.location.reload()} />
+      : <p className="text-center py-12 text-sm text-foreground/60">Create your business first.</p>;
+  }
 
   return (
     <div className="max-w-lg space-y-6">

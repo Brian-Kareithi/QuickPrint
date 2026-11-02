@@ -1,11 +1,14 @@
 'use client';
 
+import { FormSkeleton, ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, UserPlus, Trash2, Copy, Check, KeyRound } from 'lucide-react';
+import { UserPlus, Trash2, Copy, Check, KeyRound } from 'lucide-react';
 
 const empty = { name: '', email: '', phone: '', password: '' };
 
@@ -82,8 +85,14 @@ export default function TeamPage() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return (
+    <div className="max-w-3xl space-y-5">
+      <FormSkeleton fields={4} />
+      <ListSkeleton rows={3} />
+    </div>
+  );
   if (!isOwner) return <p className="text-center py-12 text-sm text-foreground/60">Only the shop owner can manage the team.</p>;
+  if (!shopId && error) return <ErrorState message={error} onRetry={() => { setLoading(true); setError(''); load(); }} />;
   if (!shopId) return <p className="text-center py-12 text-sm text-foreground/60">Create your shop first.</p>;
 
   return (

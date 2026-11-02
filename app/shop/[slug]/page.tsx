@@ -1,5 +1,8 @@
 'use client';
 
+import { ShopPortalSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
@@ -53,14 +56,25 @@ export default function CustomerPortal() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (slug) {
-      api.shops.bySlug(slug as string).then((s) => {
+  const [shopLoading, setShopLoading] = useState(true);
+  const [shopError, setShopError] = useState<{ message: string; notFound: boolean } | null>(null);
+
+  const loadShop = useCallback(() => {
+    if (!slug) return;
+    setShopLoading(true);
+    setShopError(null);
+    api.shops.bySlug(slug as string)
+      .then((s) => {
         setShop(s);
         if (s.branding) applyTheme(s.branding);
-      }).catch(() => setShop(null));
-    }
+      })
+      .catch((e) => setShopError({ message: e?.message || 'Could not load this shop', notFound: e?.status === 404 }))
+      .finally(() => setShopLoading(false));
   }, [slug]);
+
+  useEffect(() => {
+    loadShop();
+  }, [loadShop]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!shop) return;
@@ -163,19 +177,28 @@ export default function CustomerPortal() {
   const firstDelete = files.find((f) => f.deleteAfter)?.deleteAfter;
   const retentionLabel = firstDelete ? getTimeRemaining(firstDelete) : '1 hour';
 
-  if (!shop) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <Printer className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
-        <h2 className="text-lg font-semibold">Shop not found</h2>
-        <p className="text-sm text-foreground/60">This print shop doesn't exist or is inactive.</p>
+  // Skeleton while the shop loads (what a customer sees right after scanning the QR code)
+  if (shopLoading) return <ShopPortalSkeleton />;
+
+  if (!shop) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        {shopError && !shopError.notFound ? (
+          <ErrorState title="Couldn't load this shop" message={shopError.message} onRetry={loadShop} />
+        ) : (
+          <div className="text-center">
+            <Printer className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
+            <h2 className="text-lg font-semibold">Shop not found</h2>
+            <p className="text-sm text-foreground/60">This print shop doesn&apos;t exist or is inactive.</p>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  }
 
   if (page === 'done' && orderResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+      <div className="light min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
         <div className="max-w-sm w-full text-center space-y-6 bg-card rounded-xl p-8 shadow-lg border">
           <div className="h-14 w-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
             <Check className="h-7 w-7 text-green-600" />
@@ -189,7 +212,7 @@ export default function CustomerPortal() {
             <div className="flex justify-between"><span className="text-foreground/60">Total</span><span className="font-semibold">{formatCurrency(orderResult.totalAmount)}</span></div>
             <div className="flex justify-between"><span className="text-foreground/60">Status</span><Badge>{orderResult.status}</Badge></div>
             {orderResult.estimatedCompletion && (
-              <div className="flex justify-between"><span className="text-foreground/60">Est. completion</span><span>{new Date(orderResult.estimatedCompletion).toLocaleTimeString()}</span></div>
+              <div className="flex justify-between"><span className="text-foreground/60">Ready in about</span><span>{Math.max(1, Math.round((new Date(orderResult.estimatedCompletion).getTime() - new Date(orderResult.createdAt || Date.now()).getTime()) / 60000))} min</span></div>
             )}
           </div>
           <div className="bg-primary/10 border border-primary/20 text-foreground text-xs p-3 rounded-xl text-left space-y-1">
@@ -197,14 +220,14 @@ export default function CustomerPortal() {
             {paymentInstructions(shop, orderResult.paymentMethod || orderForm.paymentMethod, orderResult.totalAmount).map((l, i) => <p key={i}>{l}</p>)}
             <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>
           </div>
-          <p className="text-[11px] text-foreground/50">For your security, your files are permanently deleted from our servers about {retentionLabel} after upload.</p>
+          <p className="text-[11px] text-foreground/50">For your security, your files are permanently deleted from our servers one hour after your order is ready.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+    <div className="light min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
       <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
       <div className="qp-shop max-w-lg mx-auto px-4 py-6 space-y-6">
         <div className="text-center mb-2">
@@ -239,7 +262,7 @@ export default function CustomerPortal() {
               <Upload className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
               <p className="text-sm font-medium">Drop files here or click to browse</p>
               <p className="text-xs text-foreground/50 mt-1">PDF, DOC, DOCX, PPT, XLS, JPG, PNG, ZIP</p>
-              <p className="text-[11px] text-foreground/40 mt-1">Your files go straight to {shop.name} and are deleted automatically after 1 hour.</p>
+              <p className="text-[11px] text-foreground/40 mt-1">Your files go straight to {shop.name} and are permanently deleted one hour after your order is ready.</p>
               {uploading && <Loader2 className="h-5 w-5 animate-spin mx-auto mt-4 text-primary" />}
             </div>
 

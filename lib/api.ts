@@ -18,10 +18,39 @@ const authHeader = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+/** An API failure. `status` is the HTTP status, or 0 when the server could not be reached at all. */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status = 0) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+const REQUEST_TIMEOUT_MS = 25000;
+
 async function errorMessage(res: Response): Promise<string> {
+  if (res.status === 502 || res.status === 503 || res.status === 504) {
+    return 'The server is temporarily unavailable. Please try again in a moment.';
+  }
   const body = await res.json().catch(() => null);
   const msg = body?.message;
-  return (Array.isArray(msg) ? msg.join(', ') : msg) || `HTTP ${res.status}`;
+  return (Array.isArray(msg) ? msg.join(', ') : msg) || `Request failed (HTTP ${res.status})`;
+}
+
+/** fetch with a timeout and readable errors, so no screen can wait forever. */
+async function timedFetch(url: string, init: RequestInit = {}, ms = REQUEST_TIMEOUT_MS): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (e: any) {
+    if (e?.name === 'AbortError') throw new ApiError('The server took too long to respond. Please try again.', 0);
+    throw new ApiError("Can't reach the server. Check your internet connection and try again.", 0);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -32,12 +61,9 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const res = await timedFetch(`${API_BASE}${endpoint}`, { ...options, headers });
 
-  if (!res.ok) throw new Error(await errorMessage(res));
+  if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
 
   return res.json();
 }
@@ -110,18 +136,26 @@ export const api = {
           }
         };
 
-        xhr.onerror = () => reject(new Error('Upload failed'));
+        xhr.timeout = 5 * 60 * 1000;
+        xhr.ontimeout = () => reject(new ApiError('The upload took too long. Check your connection and try again.', 0));
+        xhr.onerror = () => reject(new ApiError("Can't reach the server. Check your internet connection and try again.", 0));
         xhr.send(formData);
       });
     },
     list: (shopId: string) => request<any[]>(`/uploads/shop/${shopId}`),
     get: (id: string) => request<any>(`/uploads/${id}`),
+    /** Fetch a customer's file (shop staff only) as a Blob, for the in-app preview. */
+    blob: async (id: string) => {
+      const res = await timedFetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() }, 60000);
+      if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
+      return res.blob();
+    },
     /** Fetch a customer's file (owner only) and open it in a new tab so it can be printed. */
     open: async (id: string) => {
       const win = window.open('', '_blank'); // opened synchronously so popup blockers allow it
       try {
-        const res = await fetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() });
-        if (!res.ok) throw new Error(await errorMessage(res));
+        const res = await timedFetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() }, 60000);
+        if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         if (win) win.location.href = url;

@@ -1,10 +1,13 @@
 'use client';
 
+import { StatCardsSkeleton, ListSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { Loader2, Building2, Users, ShoppingBag, DollarSign, CheckCircle2, PauseCircle } from 'lucide-react';
+import { Building2, Users, ShoppingBag, DollarSign, CheckCircle2, PauseCircle } from 'lucide-react';
 
 export default function AdminOverview() {
   const [stats, setStats] = useState<any>(null);
@@ -14,8 +17,14 @@ export default function AdminOverview() {
     api.admin.stats().then(setStats).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>;
-  if (!stats) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
+  if (!stats) return (
+    <div className="space-y-6">
+      <StatCardsSkeleton count={3} />
+      <StatCardsSkeleton count={3} />
+      <ListSkeleton rows={4} avatar={false} />
+    </div>
+  );
 
   const cards = [
     { icon: Building2, label: 'Total shops', value: stats.totalShops },

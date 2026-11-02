@@ -1,5 +1,8 @@
 'use client';
 
+import { DashboardSkeleton } from '@/components/skeleton';
+import { ErrorState } from '@/components/error-state';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -8,7 +11,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { OnboardingForm } from '@/components/onboarding-form';
 import { formatCurrency, formatDateTime, getStatusColor } from '@/lib/utils';
-import { DollarSign, ShoppingBag, FileText, TrendingUp, Loader2, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
+import { DollarSign, ShoppingBag, FileText, TrendingUp, CheckCircle2, Circle, ExternalLink } from 'lucide-react';
 import type { Shop, DashboardStats } from '@/types';
 
 export default function DashboardPage() {
@@ -20,6 +23,7 @@ export default function DashboardPage() {
   const [staffCount, setStaffCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user?.role === 'STAFF') router.replace('/dashboard/queue');
@@ -29,7 +33,7 @@ export default function DashboardPage() {
     api.shops.mine().then((data) => {
       setShops(data);
       if (data.length > 0) setShop(data[0]);
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch((e) => setError(e.message || 'Could not load your dashboard')).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -40,7 +44,8 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shop?.id]);
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (loading) return <DashboardSkeleton />;
+  if (error && !shop) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
   if (!shop) {
     return <OnboardingForm onCreated={(s) => { setShops([s]); setShop(s); }} />;
@@ -79,7 +84,7 @@ export default function DashboardPage() {
         </select>
       )}
 
-      <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 transition-colors ${accepting ? 'bg-[#9ad1d4]/25 border-[#9ad1d4]' : 'bg-amber-50 border-amber-200'}`}>
+      <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 transition-colors ${accepting ? 'bg-primary/10 border-primary/30' : 'bg-amber-50 border-amber-200'}`}>
         <div className="min-w-0">
           <p className="text-sm font-semibold">{accepting ? 'Your shop is open for orders' : 'Orders are paused'}</p>
           <p className="text-xs text-foreground/60">
@@ -109,7 +114,7 @@ export default function DashboardPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {steps.map((s) => (
               <Link key={s.label} href={s.href}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-[13px] transition-all hover:-translate-y-0.5 hover:shadow-sm ${s.done ? 'bg-[#9ad1d4]/25 border-[#9ad1d4]' : 'bg-background'}`}>
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-[13px] transition-all hover:-translate-y-0.5 hover:shadow-sm ${s.done ? 'bg-primary/10 border-primary/30' : 'bg-background'}`}>
                 {s.done ? <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" /> : <Circle className="h-4 w-4 text-foreground/30 flex-shrink-0" />}
                 <span className={s.done ? 'text-foreground/60 line-through' : 'font-medium'}>{s.label}</span>
               </Link>
