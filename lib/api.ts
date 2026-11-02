@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+// The API serves everything under /api; tolerate a configured URL that forgot the suffix.
+const RAW_API = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/[/]+$/, '');
+const API_BASE = RAW_API.endsWith('/api') ? RAW_API : `${RAW_API}/api`;
 
 /**
  * Public address of this web app, encoded into shop QR codes. Set NEXT_PUBLIC_APP_URL to

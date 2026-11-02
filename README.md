@@ -62,7 +62,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+- `NEXT_PUBLIC_API_URL` is the backend's base URL. It may include `/api`; the client
+  appends that path when it is omitted. The default is `http://localhost:4000/api`.
+- `NEXT_PUBLIC_APP_URL` is the public address embedded in shop QR codes. In production,
+  set it to a domain or LAN address that customers' phones can reach. If omitted, the
+  browser's current origin is used.
+
+The browser tab and iOS home-screen icons are generated from `app/icon.tsx` and
+`app/apple-icon.tsx` respectively.
 
 ## Build
 
