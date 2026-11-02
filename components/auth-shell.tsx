@@ -34,15 +34,20 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         <p className="relative text-xs text-white/40">&copy; {new Date().getFullYear()} QuickPrint</p>
       </aside>
 
-      <main className="relative flex-1 flex flex-col items-center justify-center px-1 py-6">
-        <div className="w-full max-w-sm">
-          <div className="lg:hidden flex justify-center mb-8"><Logo /></div>
+      <main className="relative flex-1 flex flex-col items-center justify-center px-1 py-6 overflow-hidden rounded-3xl lg:overflow-visible">
+        {/* Soft glow behind the container so it reads as floating (phones and tablets) */}
+        <div aria-hidden="true" className="lg:hidden pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+        <div aria-hidden="true" className="lg:hidden pointer-events-none absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-[#80ced7]/20 blur-3xl" />
+
+        {/* The whole sign-in section - logo, heading and form - lives in one floating container */}
+        <section className="page-enter relative w-full max-w-sm rounded-[2rem] border bg-card/95 backdrop-blur-sm shadow-[0_20px_50px_-12px_rgba(0,50,73,0.25)] p-6 sm:p-8">
+          <div className="lg:hidden flex justify-center mb-6"><Logo /></div>
           <div className="mb-6 text-center lg:text-left">
             <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
             <p className="text-sm text-foreground/60 mt-1">{subtitle}</p>
           </div>
-          <div className="page-enter bg-card rounded-3xl shadow-[0_8px_30px_rgba(0,50,73,0.08)] p-6 sm:p-7">{children}</div>
-        </div>
+          {children}
+        </section>
       </main>
     </div>
   );
