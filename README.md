@@ -1,89 +1,102 @@
 # QuickPrint Web
 
-Next.js 16 frontend for the QuickPrint multi-tenant print shop management platform.
+**A print-shop management and customer ordering portal.** QuickPrint helps cyber cafés,
+print shops, universities, and libraries manage incoming print jobs from upload through
+pickup.
 
-## Stack
+Built with Next.js 16, React 19, and Tailwind CSS 4.
 
-- **Framework:** Next.js 16, React 19
-- **Styling:** Tailwind CSS v4
-- **Charts:** Recharts
-- **Forms:** React Hook Form, Zod
-- **Upload:** react-dropzone
-- **Icons:** Lucide
+## Features
 
-## Getting started
+- Customer file-upload portal with shop-specific branding, print options, pricing, and order tracking
+- Live print queue and searchable order management
+- Payment setup for cash, M-Pesa, Airtel Money, and bank transfers, with payment status tracking
+- Shop QR codes, downloadable artwork, and printable posters
+- Dashboard analytics for revenue, orders, peak hours, and printer utilization
+- Shop settings, team access, branding, and platform administration
+
+## Quick start
 
 ```bash
 npm install
-npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-## Pages
-
-### Public
-
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page |
-| `/auth/login` | Sign in |
-| `/auth/register` | Create account |
-| `/shop/[slug]` | Customer upload portal (branded per shop) |
-
-### Dashboard (shop owner)
-
-| Route | Description |
-|-------|-------------|
-| `/dashboard` | Overview with stats and recent orders |
-| `/dashboard/orders` | Searchable order list |
-| `/dashboard/queue` | Real-time 3-column print queue |
-| `/dashboard/analytics` | Charts for revenue, orders, hours, utilization |
-| `/dashboard/branding` | Theme editor with live preview |
-| `/dashboard/pricing` | Per-item pricing configuration |
-| `/dashboard/qrcode` | QR code view, download, and poster |
-| `/dashboard/settings` | Shop information |
-
-### Admin
-
-| Route | Description |
-|-------|-------------|
-| `/admin` | Platform administration |
-| `/admin?tab=shops` | Shop management |
-| `/admin?tab=retention` | Deletion compliance |
-
-### Other
-
-| Route | Description |
-|-------|-------------|
-| `/notifications` | Notification center |
-
-## Environment
+Create a `.env.local` file in the project root:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-- `NEXT_PUBLIC_API_URL` is the backend's base URL. It may include `/api`; the client
-  appends that path when it is omitted. The default is `http://localhost:4000/api`.
-- `NEXT_PUBLIC_APP_URL` is the public address embedded in shop QR codes. In production,
-  set it to a domain or LAN address that customers' phones can reach. If omitted, the
-  browser's current origin is used.
-
-The browser tab and iOS home-screen icons are generated from `app/icon.tsx` and
-`app/apple-icon.tsx` respectively.
-
-## Build
+Start the development server:
 
 ```bash
-npm run build
-npm start
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Configuration
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `NEXT_PUBLIC_API_URL` | Backend base URL. The client adds `/api` if it is not present. | `http://localhost:4000/api` |
+| `NEXT_PUBLIC_APP_URL` | Public app URL embedded in shop QR codes. Set this to a domain or LAN address customers can reach. | Current browser origin |
+
+In production, configure `NEXT_PUBLIC_APP_URL` to the deployed public address before generating shop QR codes. `localhost` only works on the machine running the app.
+
+## Application routes
+
+### Public and customer
+
+| Route | Description |
+|-------|-------------|
+| `/` | Product landing page |
+| `/auth/login` | Sign in |
+| `/auth/register` | Create an account |
+| `/shop/[slug]` | Shop-branded customer upload and ordering portal |
+| `/my-orders` | Customer order history |
+
+### Shop dashboard
+
+| Route | Description |
+|-------|-------------|
+| `/dashboard` | Shop overview and onboarding checklist |
+| `/dashboard/orders` | Search and manage orders, including payment status |
+| `/dashboard/queue` | Print queue and job status updates |
+| `/dashboard/analytics` | Revenue, order, peak-hour, and utilization charts |
+| `/dashboard/payments` | Configure customer payment instructions |
+| `/dashboard/qrcode` | Customer link, QR downloads, and printable poster |
+| `/dashboard/branding` | Shop theme and branding |
+| `/dashboard/pricing` | Per-item print pricing |
+| `/dashboard/settings` | Shop information and settings |
+| `/dashboard/team` | Team and cashier access |
+
+### Administration
+
+| Route | Description |
+|-------|-------------|
+| `/admin` | Platform administration |
+| `/admin?tab=shops` | Shop management |
+| `/admin?tab=retention` | Data retention controls |
+
+Other routes include `/notifications` for the notification center.
+
+## Development commands
+
+```bash
+npm run dev      # Start the local development server
+npm run lint     # Run ESLint
+npm run build    # Create a production build
+npm start        # Serve the production build
 ```
 
 ## Docker
 
 ```bash
 docker build -t quickprint-web .
-docker run -p 3000:3000 quickprint-web
+docker run --env-file .env.local -p 3000:3000 quickprint-web
 ```
+
+The browser-tab and iOS home-screen icons are generated by `app/icon.tsx` and
+`app/apple-icon.tsx`.

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { PrintFileButton } from '@/components/print-file-button';
+import { MarkPaidButton } from '@/components/mark-paid-button';
 import { Button } from '@/components/ui/button';
 import { formatDateTime, getStatusColor, formatFileSize } from '@/lib/utils';
 import { Loader2, Play, CheckCircle, XCircle, Clock, Printer, Package, RefreshCw } from 'lucide-react';
@@ -68,7 +69,7 @@ export default function QueuePage() {
         ))}
       </div>
       <div className="flex items-center justify-between pt-3 border-t text-xs text-foreground/50">
-        <span>{formatDateTime(order.createdAt)}</span>
+        <span className="flex items-center gap-2">{formatDateTime(order.createdAt)} <MarkPaidButton order={order} onChange={() => loadQueue()} /></span>
         <div className="flex gap-1.5">
           {actions.map((action) => (
             <Button key={action.label} size="sm" variant={action.variant || 'ghost'} onClick={() => updateStatus(order.id, action.status)}>

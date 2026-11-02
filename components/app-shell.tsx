@@ -39,13 +39,13 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
 
       {/* Floating sidebar */}
       <aside
-        className={`fixed z-50 top-3 bottom-3 left-3 w-64 rounded-2xl border bg-card/90 backdrop-blur-xl shadow-xl shadow-black/5 flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed z-50 top-3 bottom-3 left-3 w-56 rounded-2xl bg-[#003249] text-white shadow-2xl shadow-[#003249]/30 flex flex-col transition-transform duration-300 ease-out ${
           open ? 'translate-x-0' : '-translate-x-[110%]'
         } lg:translate-x-0`}
       >
-        <div className="flex items-center justify-between h-16 px-5">
-          <Logo />
-          <button onClick={() => setOpen(false)} className="lg:hidden p-1.5 rounded-lg hover:bg-muted">
+        <div className="flex items-center justify-between h-14 px-4">
+          <Logo tone="light" size="sm" />
+          <button onClick={() => setOpen(false)} className="lg:hidden p-1.5 rounded-lg hover:bg-white/10">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -56,10 +56,10 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ${
                 isActive(item.href)
-                  ? 'bg-primary text-white shadow-md shadow-primary/25'
-                  : 'text-foreground/60 hover:bg-muted hover:text-foreground hover:translate-x-0.5'
+                  ? 'bg-primary text-white shadow-lg shadow-black/20'
+                  : 'text-white/65 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -68,23 +68,23 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
           ))}
         </nav>
 
-        <div className="m-3 p-3 rounded-xl bg-muted/70 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold flex-shrink-0">
+        <div className="m-2.5 p-2.5 rounded-xl bg-white/10 flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-full bg-[#80ced7] text-[#003249] flex items-center justify-center text-sm font-semibold flex-shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{user.name}</p>
-            <p className="text-[11px] text-foreground/50 truncate">{roleLabel}</p>
+            <p className="text-[11px] text-white/55 truncate">{roleLabel}</p>
           </div>
-          <button onClick={onLogout} title="Sign out" className="p-1.5 rounded-lg hover:bg-background text-foreground/50 hover:text-foreground transition-colors">
+          <button onClick={onLogout} title="Sign out" className="p-1.5 rounded-lg hover:bg-white/15 text-white/60 hover:text-white transition-colors">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </aside>
 
-      <div className="lg:pl-72 lg:pr-6">
+      <div className="lg:pl-64 lg:pr-5">
         {/* Floating topbar */}
-        <header className="sticky top-3 z-30 mx-3 lg:mx-0 h-14 rounded-2xl border bg-card/80 backdrop-blur-xl shadow-lg shadow-black/5 flex items-center px-4 gap-3">
+        <header className="sticky top-3 z-30 mx-3 lg:mx-0 h-12 rounded-2xl border border-white/60 bg-card/80 backdrop-blur-xl shadow-lg shadow-[#003249]/10 flex items-center px-4 gap-3">
           <button onClick={() => setOpen(true)} className="lg:hidden p-1.5 rounded-lg hover:bg-muted">
             <Menu className="h-5 w-5" />
           </button>

@@ -8,7 +8,7 @@ import { Loader2, Save } from 'lucide-react';
 import { LogoMark } from '@/components/logo';
 
 const COLORS = [
-  '#0f766e', '#2563eb', '#16a34a', '#ca8a04', '#dc2626',
+  '#007ea7', '#003249', '#16a34a', '#ca8a04', '#dc2626',
   '#7c3aed', '#db2777', '#ea580c', '#0891b2', '#334155',
 ];
 

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { applyTheme } from '@/lib/theme';
 import { useAuth } from '@/lib/auth-context';
 import { LogoMark } from '@/components/logo';
+import { paymentOptions, paymentInstructions } from '@/lib/payments';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
 import { Upload, FileText, X, Printer, Check, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
@@ -37,13 +38,12 @@ export default function CustomerPortal() {
   const [error, setError] = useState('');
   const [orderForm, setOrderForm] = useState({
     customerName: '', customerEmail: '', customerPhone: '',
-    paymentMethod: 'CASH_ON_PICKUP',
+    paymentMethod: '',
     scheduledPickup: '',
   });
   const [printOptions, setPrintOptions] = useState<Record<string, any>>({});
   const [pricing, setPricing] = useState<PriceBreakdown | null>(null);
   const [orderResult, setOrderResult] = useState<any>(null);
-  const [paymentResult, setPaymentResult] = useState<any>(null);
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [page, setPage] = useState<'upload' | 'options' | 'review' | 'done'>('upload');
 
@@ -136,7 +136,7 @@ export default function CustomerPortal() {
         customerName: orderForm.customerName || undefined,
         customerEmail: orderForm.customerEmail || undefined,
         customerPhone: orderForm.customerPhone || undefined,
-        paymentMethod: orderForm.paymentMethod,
+        paymentMethod: orderForm.paymentMethod || paymentOptions(shop)[0].value,
         scheduledPickup: orderForm.scheduledPickup || undefined,
         items: files.map((f) => ({
           uploadId: f.id, fileName: f.originalName, fileSize: f.fileSize,
@@ -151,11 +151,6 @@ export default function CustomerPortal() {
         })),
       });
       setOrderResult(order);
-
-      if (orderForm.paymentMethod === 'MPESA' && orderForm.customerPhone) {
-        const payment = await api.payments.mpesa(order.id, orderForm.customerPhone, order.totalAmount);
-        setPaymentResult(payment);
-      }
 
       setPage('done');
     } catch (err: any) {
@@ -197,9 +192,11 @@ export default function CustomerPortal() {
               <div className="flex justify-between"><span className="text-foreground/60">Est. completion</span><span>{new Date(orderResult.estimatedCompletion).toLocaleTimeString()}</span></div>
             )}
           </div>
-          {paymentResult && (
-            <div className="bg-blue-50 border border-blue-100 text-blue-700 text-xs p-3 rounded-lg">{paymentResult.message}</div>
-          )}
+          <div className="bg-primary/10 border border-primary/20 text-[#003249] text-xs p-3 rounded-lg text-left space-y-1">
+            <p className="font-semibold">How to pay</p>
+            {paymentInstructions(shop, orderResult.paymentMethod || orderForm.paymentMethod, orderResult.totalAmount).map((l, i) => <p key={i}>{l}</p>)}
+            <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>
+          </div>
           <p className="text-[11px] text-foreground/50">For your security, your files are permanently deleted from our servers about {retentionLabel} after upload.</p>
         </div>
       </div>
@@ -379,12 +376,10 @@ export default function CustomerPortal() {
               ))}
               <div>
                 <label className="text-xs text-foreground/60 block mb-1">Payment method</label>
-                <select value={orderForm.paymentMethod}
+                <select value={orderForm.paymentMethod || paymentOptions(shop)[0].value}
                   onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value })}
                   className={selectClass}>
-                  <option value="CASH_ON_PICKUP">Cash on pickup</option>
-                  <option value="MPESA">M-Pesa</option>
-                  <option value="AIRTEL_MONEY">Airtel Money</option>
+                  {paymentOptions(shop).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>

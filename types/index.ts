@@ -22,6 +22,16 @@ export interface Shop {
   isActive: boolean;
   isSuspended: boolean;
   ownerId: string;
+  acceptCash?: boolean;
+  mpesaMethod?: string | null;
+  mpesaNumber?: string | null;
+  mpesaAccountRef?: string | null;
+  mpesaAccountName?: string | null;
+  airtelNumber?: string | null;
+  bankName?: string | null;
+  bankAccountName?: string | null;
+  bankAccountNumber?: string | null;
+  paymentNotes?: string | null;
   branding?: ShopBranding;
   pricing?: ShopPricing;
   allowedFileTypes?: AllowedFileType[];

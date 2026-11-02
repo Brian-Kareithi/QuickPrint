@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Multi-tenant print shop management platform for cyber cafés, print shops, universities, and libraries.',
 };
 
-export const viewport: Viewport = { themeColor: '#0f766e' };
+export const viewport: Viewport = { themeColor: '#003249' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

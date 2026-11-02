@@ -57,7 +57,7 @@ export const api = {
     me: () => request<any>('/auth/me'),
   },
   shops: {
-    create: (data: { name: string; description?: string; email?: string; phone?: string; address?: string }) =>
+    create: (data: Record<string, any>) =>
       request<any>('/shops', { method: 'POST', body: JSON.stringify(data) }),
     mine: () => request<any[]>('/shops'),
     bySlug: (slug: string) => request<any>(`/shops/slug/${slug}`),
@@ -143,6 +143,8 @@ export const api = {
     completed: (shopId: string) => request<any[]>(`/orders/completed/${shopId}`),
     get: (id: string) => request<any>(`/orders/${id}`),
     mine: () => request<any[]>('/orders/mine'),
+    setPayment: (id: string, paid: boolean, method?: string) =>
+      request<any>(`/orders/${id}/payment`, { method: 'PATCH', body: JSON.stringify({ paid, method }) }),
     byNumber: (num: string) => request<any>(`/orders/number/${num}`),
     updateStatus: (id: string, status: string) =>
       request<any>(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),

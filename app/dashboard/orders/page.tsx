@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PrintFileButton } from '@/components/print-file-button';
+import { MarkPaidButton } from '@/components/mark-paid-button';
 import { formatCurrency, formatDateTime, getStatusColor, getPaymentStatusColor } from '@/lib/utils';
 import { Loader2, Search } from 'lucide-react';
 
@@ -71,6 +72,11 @@ export default function OrdersPage() {
                 {expanded === order.id && (
                   <tr className="border-b border-border/50 bg-muted/20">
                     <td colSpan={7} className="p-4 space-y-2">
+                      <div className="flex items-center gap-2 text-xs pb-1">
+                        <span className="text-foreground/60">Payment:</span>
+                        <MarkPaidButton order={order} onChange={(u) => setOrders((prev) => prev.map((o) => (o.id === u.id ? { ...o, ...u } : o)))} />
+                        {order.customerPhone && <span className="text-foreground/60">· {order.customerName || 'Customer'}: {order.customerPhone}</span>}
+                      </div>
                       {order.items?.map((item: any) => (
                         <div key={item.id} className="flex items-center gap-3 text-xs text-foreground/70">
                           <span className="truncate font-medium">{item.fileName}</span>

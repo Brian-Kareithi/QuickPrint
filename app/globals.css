@@ -7,16 +7,16 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--secondary);
   --color-secondary-foreground: #ffffff;
-  --color-muted: #ebe8df;
-  --color-muted-foreground: #6b6f6c;
-  --color-accent: #e6e3d9;
-  --color-accent-foreground: #1c1f1e;
+  --color-muted: #d3e1e2;
+  --color-muted-foreground: #4f6f7d;
+  --color-accent: #c4dcde;
+  --color-accent-foreground: #003249;
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-destructive-foreground: #ffffff;
-  --color-card: #fffefb;
-  --color-card-foreground: #1c1f1e;
-  --color-border: #e1ded2;
-  --color-input: #d9d6c9;
+  --color-card: #f6fafa;
+  --color-card-foreground: #003249;
+  --color-border: #bcd1d4;
+  --color-input: #aac6ca;
   --color-ring: var(--primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -24,13 +24,17 @@
 }
 
 :root {
-  /* Calm paper-and-ink palette with a single teal accent */
-  --background: #f6f5f0;
-  --foreground: #1c1f1e;
-  --primary: #0f766e;
-  --secondary: #115e59;
-  --border: #e1ded2;
+  /* Palette: Alabaster #ccdbdc, Frosted Blue #9ad1d4 / #80ced7, Cerulean #007ea7, Deep Space #003249 */
+  --background: #e3ecec;
+  --foreground: #003249;
+  --primary: #007ea7;
+  --secondary: #003249;
+  --border: #bcd1d4;
+  --ink: #003249;
+  --frost: #9ad1d4;
 }
+
+html { font-size: 14px; } /* compact density across the whole system */
 
 body {
   background: var(--background);
@@ -45,7 +49,7 @@ body {
 }
 
 ::selection {
-  background-color: #bfe6df;
+  background-color: #80ced7;
   color: #000;
 }
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import {
   LayoutDashboard, ShoppingBag, ListTodo, BarChart3, Settings, QrCode,
-  Palette, DollarSign, Users,
+  Palette, DollarSign, Users, Wallet,
 } from 'lucide-react';
 import type { Shop } from '@/types';
 import { homeFor } from '@/lib/roles';
@@ -19,6 +19,7 @@ const OWNER_NAV: NavItem[] = [
   { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
   { href: '/dashboard/qrcode', icon: QrCode, label: 'QR Code' },
   { href: '/dashboard/team', icon: Users, label: 'Team' },
+  { href: '/dashboard/payments', icon: Wallet, label: 'Payments' },
   { href: '/dashboard/branding', icon: Palette, label: 'Branding' },
   { href: '/dashboard/pricing', icon: DollarSign, label: 'Pricing' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
