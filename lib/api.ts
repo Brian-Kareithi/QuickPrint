@@ -197,6 +197,8 @@ export const api = {
     updateUser: (id: string, data: { role?: string; isSuspended?: boolean }) =>
       request<any>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     activity: (page = 1) => request<any>(`/admin/activity?page=${page}`),
+    changeShopOwner: (shopId: string, ownerId: string) =>
+      request<any>(`/admin/shops/${shopId}/owner`, { method: 'PATCH', body: JSON.stringify({ ownerId }) }),
     suspend: (id: string) => request<any>(`/admin/shops/${id}/suspend`, { method: 'POST' }),
     activate: (id: string) => request<any>(`/admin/shops/${id}/activate`, { method: 'POST' }),
     health: () => request<any>('/admin/health'),

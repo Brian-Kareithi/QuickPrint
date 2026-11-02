@@ -13,6 +13,7 @@ const describe = (log: any): string => {
     case 'USER_ACTIVATED': return `reactivated user ${m.email}`;
     case 'SHOP_SUSPENDED': return `suspended shop ${m.name}`;
     case 'SHOP_ACTIVATED': return `reactivated shop ${m.name}`;
+    case 'SHOP_OWNER_CHANGED': return `transferred shop ${m.name} from ${m.from} to ${m.to}`;
     default: return log.action.toLowerCase().replace(/_/g, ' ');
   }
 };
