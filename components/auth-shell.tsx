@@ -10,8 +10,8 @@ const POINTS = [
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
-    <div className="h-[calc(100dvh-2.75rem)] overflow-hidden flex flex-col lg:grid lg:grid-cols-[1.05fr_1fr] p-3 gap-3">
-      <aside className="hidden lg:flex flex-col justify-between min-h-0 rounded-3xl bg-panel text-white p-[clamp(1.5rem,5dvh,2.5rem)] relative overflow-hidden">
+    <div className="fit-screen overflow-hidden flex flex-col lg:grid lg:grid-cols-[1.05fr_1fr] p-3 gap-3">
+      <aside className="hidden lg:flex flex-col justify-between min-h-0 rounded-3xl bg-panel text-white auth-aside relative overflow-hidden">
         <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
         <div className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[#80ced7]/20 blur-3xl" />
         <Logo tone="light" />
@@ -19,7 +19,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
           <h2 className="text-3xl font-semibold tracking-tight leading-tight max-w-sm">
             Print shop orders, without the paper trail.
           </h2>
-          <ul className="mt-[clamp(1rem,4dvh,2rem)] space-y-[clamp(0.5rem,2dvh,1rem)]">
+          <ul className="auth-points">
             {POINTS.map((p) => (
               <li key={p.text} className="flex items-center gap-3 text-sm text-white/80">
                 <span className="h-9 w-9 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">

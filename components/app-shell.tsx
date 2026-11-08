@@ -44,7 +44,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
     href === '/dashboard' || href === '/admin' || href === '/my-orders' ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="h-[calc(100dvh-2.75rem)] overflow-hidden">
+    <div className="fit-screen overflow-hidden">
       {open && <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden" onClick={() => setOpen(false)} />}
 
       <aside
