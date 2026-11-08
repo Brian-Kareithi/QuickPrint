@@ -83,6 +83,8 @@ export const api = {
       request<any>('/shops', { method: 'POST', body: JSON.stringify(data) }),
     mine: () => request<any[]>('/shops'),
     bySlug: (slug: string) => request<any>(`/shops/slug/${slug}`),
+    byCode: (code: string) => request<any>(`/shops/code/${encodeURIComponent(code.trim().toUpperCase())}`),
+    regenerateCode: (id: string) => request<{ shopCode: string }>(`/shops/${id}/code/regenerate`, { method: 'POST' }),
     byId: (id: string) => request<any>(`/shops/${id}`),
     update: (id: string, data: any) =>
       request<any>(`/shops/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),

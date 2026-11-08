@@ -46,7 +46,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-8 min-h-[calc(100svh-4rem)] grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-8 items-center content-center">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-8 min-h-[calc(100vh-4rem)] grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-8 items-center content-center">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] uppercase text-[#007ea7] mb-5">Print shop software</p>
             <h1 className="font-display text-[clamp(2.6rem,min(9vw,11vh),5.5rem)] leading-[1.02] tracking-tight">

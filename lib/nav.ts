@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ShoppingBag, ListTodo, BarChart3, Settings, QrCode, Palette, DollarSign,
-  Users, Wallet, Building2, Shield, UserCog, ScrollText, Receipt, UserCircle,
+  Users, Wallet, Building2, Shield, UserCog, ScrollText, Receipt, UserCircle, Upload,
 } from 'lucide-react';
 import type { NavItem } from '@/components/app-shell';
 
@@ -31,7 +31,14 @@ export function navFor(role: string): { nav: NavItem[]; roleLabel: string } {
         ],
       };
     case 'CUSTOMER':
-      return { roleLabel: 'Customer', nav: [{ href: '/my-orders', icon: Receipt, label: 'My orders' }, profile] };
+      return {
+        roleLabel: 'Customer',
+        nav: [
+          { href: '/send-files', icon: Upload, label: 'Send files' },
+          { href: '/my-orders', icon: Receipt, label: 'My orders' },
+          profile,
+        ],
+      };
     default:
       return {
         roleLabel: 'Shop owner',
