@@ -207,29 +207,29 @@ export default function CustomerPortal() {
 
   if (page === 'done' && orderResult) {
     return (
-      <div className="light-brand min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
-        <div className="max-w-sm w-full text-center space-y-6 bg-card rounded-xl p-8 shadow-lg border">
-          <div className="h-14 w-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
-            <Check className="h-7 w-7 text-green-600" />
+      <div className="light-brand fit-screen overflow-hidden flex items-center justify-center p-3" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+        <div className="page-enter max-w-sm w-full max-h-full overflow-y-auto text-center space-y-[clamp(0.5rem,1.8vh,1rem)] bg-card rounded-[2rem] p-[clamp(1rem,3vh,2rem)] shadow-[0_20px_50px_-12px_rgba(0,50,73,0.25)] border">
+          <div className="h-[clamp(2.5rem,7vh,3.5rem)] aspect-square rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
+            <Check className="h-1/2 w-1/2 text-green-600" />
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Order placed!</h1>
-            <p className="text-3xl font-bold text-primary mt-2 tracking-tight">{orderResult.orderNumber}</p>
+            <p className="text-[clamp(1.5rem,4.5vh,1.875rem)] font-bold text-primary mt-1 tracking-tight">{orderResult.orderNumber}</p>
             <p className="text-xs text-foreground/60 mt-1">Save this order number</p>
           </div>
-          <div className="bg-muted/50 rounded-lg p-4 text-xs space-y-2 text-left">
+          <div className="bg-muted/50 rounded-2xl p-3 text-xs space-y-1.5 text-left">
             <div className="flex justify-between"><span className="text-foreground/60">Total</span><span className="font-semibold">{formatCurrency(orderResult.totalAmount)}</span></div>
             <div className="flex justify-between"><span className="text-foreground/60">Status</span><Badge>{orderResult.status}</Badge></div>
             {orderResult.estimatedCompletion && (
               <div className="flex justify-between"><span className="text-foreground/60">Ready in about</span><span>{Math.max(1, Math.round((new Date(orderResult.estimatedCompletion).getTime() - new Date(orderResult.createdAt || Date.now()).getTime()) / 60000))} min</span></div>
             )}
           </div>
-          <div className="bg-primary/10 border border-primary/20 text-foreground text-xs p-3 rounded-xl text-left space-y-1">
+          <div className="bg-primary/10 border border-primary/20 text-foreground text-xs p-3 rounded-2xl text-left space-y-0.5">
             <p className="font-semibold">How to pay</p>
             {paymentInstructions(shop, orderResult.paymentMethod || orderForm.paymentMethod, orderResult.totalAmount).map((l, i) => <p key={i}>{l}</p>)}
             <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>
           </div>
-          <p className="text-[11px] text-foreground/50">For your security, your files are permanently deleted from our servers one hour after your order is ready.</p>
+          <p className="text-[11px] text-foreground/50">{user ? 'This order is saved to your account.' : 'Sign in or create a customer account with the same email to see this order in your account.'} Your files are permanently deleted one hour after your order is ready.</p>
         </div>
       </div>
     );

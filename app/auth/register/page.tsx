@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ const FIELDS: Record<FieldKey, [string, string, string, string]> = {
 
 export default function RegisterPage() {
   const [data, setData] = useState({ name: '', email: '', password: '', phone: '' });
+  const [confirm, setConfirm] = useState('');
   const [accountType, setAccountType] = useState<'OWNER' | 'CUSTOMER'>('OWNER');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,6 +30,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (data.password !== confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
     setLoading(true);
     try {
       const user = await register({ ...data, accountType });
@@ -42,7 +47,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell title="Create your account" subtitle={accountType === 'OWNER' ? 'Start managing your print shop.' : 'Track your print orders.'}>
-      <form onSubmit={handleSubmit} className="auth-form">
+      <form onSubmit={handleSubmit} className="auth-form auth-compact">
         {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
         <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-xl flex-shrink-0">
           {([['OWNER', 'Shop owner'], ['CUSTOMER', 'Customer']] as const).map(([v, l]) => (
@@ -55,9 +60,15 @@ export default function RegisterPage() {
         {(Object.keys(FIELDS) as FieldKey[]).map((key) => {
           const [label, type, autoComplete, placeholder] = FIELDS[key];
           return (
-            <AuthField key={key} label={label} type={type} autoComplete={autoComplete} placeholder={placeholder}
-              value={data[key]} onChange={(e) => setData({ ...data, [key]: e.target.value })}
-              required={key !== 'phone'} minLength={key === 'password' ? 8 : undefined} />
+            <Fragment key={key}>
+              <AuthField label={label} type={type} autoComplete={autoComplete} placeholder={placeholder}
+                value={data[key]} onChange={(e) => setData({ ...data, [key]: e.target.value })}
+                required={key !== 'phone'} minLength={key === 'password' ? 8 : undefined} />
+              {key === 'password' && (
+                <AuthField label="Confirm password" type="password" autoComplete="new-password" placeholder="Re-enter your password"
+                  value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={8} />
+              )}
+            </Fragment>
           );
         })}
         <button type="submit" disabled={loading}

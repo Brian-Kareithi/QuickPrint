@@ -24,8 +24,30 @@ export default function MyOrdersPage() {
     if (loading) return;
     if (!isAuthenticated) router.push('/auth/login');
     else if (user && user.role !== 'CUSTOMER') router.replace(homeFor(user));
-    else api.orders.mine().then(setOrders).catch((e) => setError(e.message || 'Could not load your orders')).finally(() => setBusy(false));
   }, [loading, isAuthenticated, user, router]);
+
+  const isCustomer = !loading && isAuthenticated && user?.role === 'CUSTOMER';
+
+  useEffect(() => {
+    if (!isCustomer) return;
+    let alive = true;
+    const load = (first: boolean) =>
+      api.orders.mine()
+        .then((o) => { if (alive) { setOrders(o); setError(''); } })
+        .catch((e) => { if (alive && first) setError(e.message || 'Could not load your orders'); })
+        .finally(() => { if (alive && first) setBusy(false); });
+    load(true);
+    const tick = () => { if (document.visibilityState === 'visible') load(false); };
+    const timer = setInterval(tick, 10000);
+    document.addEventListener('visibilitychange', tick);
+    window.addEventListener('focus', tick);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', tick);
+      window.removeEventListener('focus', tick);
+    };
+  }, [isCustomer]);
 
   if (loading || !user || user.role !== 'CUSTOMER') {
     return <ShellSkeleton />;
