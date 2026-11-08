@@ -1,6 +1,6 @@
 'use client';
 
-import { ShopPortalSkeleton } from '@/components/skeleton';
+import { ShopPortalSkeleton, type ShopHint } from '@/components/skeleton';
 import { ErrorState } from '@/components/error-state';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -14,7 +14,7 @@ import { acceptFor } from '@/lib/file-types';
 import { LogoMark } from '@/components/logo';
 import { paymentOptions, paymentInstructions } from '@/lib/payments';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
-import { Upload, FileText, X, Printer, Check, Loader2, Phone, Mail, MapPin, RefreshCw } from 'lucide-react';
+import { Upload, FileText, X, Printer, Check, Loader2, Phone, Mail, MapPin, RefreshCw, Moon } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import type { Shop, PriceBreakdown } from '@/types';
 
@@ -59,6 +59,13 @@ export default function CustomerPortal() {
   const [shopLoading, setShopLoading] = useState(true);
   const [shopError, setShopError] = useState<{ message: string; notFound: boolean } | null>(null);
 
+  const [hint, setHint] = useState<ShopHint | null>(null);
+  const cacheKey = `qp-shop:${slug}`;
+
+  useEffect(() => {
+    try { const raw = localStorage.getItem(cacheKey); if (raw) setHint(JSON.parse(raw)); } catch {}
+  }, [cacheKey]);
+
   const loadShop = useCallback(() => {
     if (!slug) return;
     setShopLoading(true);
@@ -67,10 +74,13 @@ export default function CustomerPortal() {
       .then((s) => {
         setShop(s);
         if (s.branding) applyTheme(s.branding);
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ open: s.isAcceptingOrders !== false, bg: s.branding?.backgroundColor, brand: s.branding?.primaryColor }));
+        } catch {}
       })
       .catch((e) => setShopError({ message: e?.message || 'Could not load this shop', notFound: e?.status === 404 }))
       .finally(() => setShopLoading(false));
-  }, [slug]);
+  }, [slug, cacheKey]);
 
   useEffect(() => {
     loadShop();
@@ -177,7 +187,7 @@ export default function CustomerPortal() {
   const firstDelete = files.find((f) => f.deleteAfter)?.deleteAfter;
   const retentionLabel = firstDelete ? getTimeRemaining(firstDelete) : '1 hour';
 
-  if (shopLoading) return <ShopPortalSkeleton />;
+  if (shopLoading) return <ShopPortalSkeleton hint={hint} />;
 
   if (!shop) {
     return (
@@ -239,86 +249,119 @@ export default function CustomerPortal() {
     ].filter(Boolean) as { icon: typeof Phone; label: string; href?: string }[];
 
     return (
-      <div className="light-brand fit-screen overflow-hidden relative flex items-center justify-center p-4" style={{ backgroundColor: pageBg }}>
-        <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-20" style={{ backgroundColor: brand }} />
-        <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full blur-3xl opacity-15" style={{ backgroundColor: brand }} />
-        <div className="page-enter relative w-full max-w-sm max-h-full overflow-y-auto rounded-[2rem] border bg-card/95 backdrop-blur-sm shadow-[0_20px_50px_-12px_rgba(0,50,73,0.25)] p-6 sm:p-8 text-center">
-          <div className="h-14 w-14 rounded-2xl overflow-hidden mx-auto grayscale opacity-80">{logo}</div>
-          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-foreground/60">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Closed for now
-          </span>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight leading-tight">{shop.name} isn&apos;t taking orders right now</h1>
-          <p className="mt-2 text-sm text-foreground/60">
-            Uploads are paused. Please check back a little later and you can send your files straight from your phone.
-          </p>
-          {contacts.length > 0 && (
-            <ul className="mt-5 space-y-2 text-left">
-              {contacts.map((c) => {
-                const inner = (
-                  <>
-                    <span className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brand + '22', color: brand }}><c.icon className="h-4 w-4" /></span>
-                    <span className="text-sm truncate">{c.label}</span>
-                  </>
-                );
-                return (
-                  <li key={c.label}>
-                    {c.href
-                      ? <a href={c.href} className="flex items-center gap-3 rounded-xl border p-2 hover:bg-muted transition-colors">{inner}</a>
-                      : <div className="flex items-center gap-3 rounded-xl border p-2">{inner}</div>}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          <button onClick={loadShop}
-            className="mt-5 w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-medium text-white"
-            style={{ backgroundColor: brand, borderRadius: shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? 0 : '0.75rem' }}>
-            <RefreshCw className="h-4 w-4" /> Check again
-          </button>
+      <div className="fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: pageBg }}>
+        <div className="page-enter relative flex-1 min-h-0 overflow-hidden rounded-3xl bg-panel text-white flex items-center justify-center p-5">
+          <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full blur-3xl opacity-40" style={{ backgroundColor: brand }} />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[#80ced7]/20 blur-3xl" />
+
+          <div className="relative w-full max-w-md max-h-full overflow-y-auto text-center">
+            <div className="relative mx-auto h-[clamp(4.5rem,13vh,7rem)] aspect-square flex items-center justify-center">
+              <span className="absolute inset-0 rounded-full border border-white/10" />
+              <span className="absolute inset-[12%] rounded-full border border-white/15" />
+              <span className="absolute inset-[26%] rounded-full bg-white/10 backdrop-blur-sm" />
+              <div className="relative h-[34%] aspect-square rounded-xl overflow-hidden">{logo}</div>
+              <span className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-panel border border-white/15 flex items-center justify-center">
+                <Moon className="h-4 w-4 text-[#80ced7]" />
+              </span>
+            </div>
+
+            <p className="mt-5 text-xs font-medium tracking-[0.18em] uppercase text-[#80ced7]">{shop.name}</p>
+            <h1 className="font-display mt-2 text-[clamp(2.25rem,min(11vw,8vh),3.75rem)] leading-[1.05] tracking-tight">
+              We&apos;re closed <em className="text-[#80ced7]">right now.</em>
+            </h1>
+            <p className="mt-3 text-sm text-white/65 max-w-xs mx-auto leading-relaxed">
+              New print orders are paused. Come back a little later and you can send your files straight from your phone.
+            </p>
+
+            {contacts.length > 0 && (
+              <ul className="mt-5 grid gap-2 text-left">
+                {contacts.map((c) => {
+                  const inner = (
+                    <>
+                      <span className="h-8 w-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0"><c.icon className="h-4 w-4 text-[#80ced7]" /></span>
+                      <span className="text-sm text-white/85 truncate">{c.label}</span>
+                    </>
+                  );
+                  return (
+                    <li key={c.label}>
+                      {c.href
+                        ? <a href={c.href} className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-2 hover:bg-white/10 transition-colors">{inner}</a>
+                        : <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-2">{inner}</div>}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            <button onClick={loadShop}
+              className="mt-5 w-full h-12 rounded-xl bg-white text-[#003249] text-sm font-semibold hover:bg-[#9ad1d4] transition-colors inline-flex items-center justify-center gap-2">
+              <RefreshCw className="h-4 w-4" /> Check again
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
+  const STEPS = [['upload', 'Upload'], ['options', 'Options'], ['review', 'Review']] as const;
+  const stepIndex = STEPS.findIndex(([k]) => k === page);
+
   return (
-    <div className="light-brand fit-screen overflow-hidden" style={{ backgroundColor: pageBg }}>
+    <div className="light-brand fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: pageBg }}>
       <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
-      <div className="qp-shop h-full w-full max-w-lg mx-auto px-4 pt-4 flex flex-col gap-3">
-        <div className="flex-shrink-0 flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl overflow-hidden flex-shrink-0">{logo}</div>
-          <div className="min-w-0">
-            <h1 className="text-base font-semibold tracking-tight truncate" style={{ color: shop.branding?.primaryColor }}>{shop.name}</h1>
-            <p className="text-xs text-foreground/60 truncate">{shop.welcomeMessage || 'Upload your documents for printing'}</p>
+      <div className="qp-shop w-full max-w-lg mx-auto flex-1 min-h-0 flex flex-col gap-3">
+        <header className="page-enter relative flex-shrink-0 overflow-hidden rounded-3xl bg-panel text-white px-4 py-3 flex items-center gap-3">
+          <div aria-hidden="true" className="pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full blur-3xl opacity-40" style={{ backgroundColor: brand }} />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-[#80ced7]/20 blur-3xl" />
+          <div className="relative h-12 w-12 rounded-2xl overflow-hidden bg-white/10 flex-shrink-0">{logo}</div>
+          <div className="relative min-w-0 flex-1">
+            <h1 className="font-display text-2xl leading-tight tracking-tight truncate">{shop.name}</h1>
+            <p className="text-xs text-white/65 truncate">{shop.welcomeMessage || 'Upload your documents for printing'}</p>
           </div>
-        </div>
+          <span className="relative hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-medium flex-shrink-0">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Open
+          </span>
+        </header>
 
-        <div className="flex-shrink-0 flex gap-2">
-          {['upload', 'options', 'review'].map((p) => (
-            <div key={p} className={`flex-1 h-1 rounded-full ${page === p ? 'bg-primary' : 'bg-muted'}`} />
+        <ol className="flex-shrink-0 flex items-center justify-center gap-2 text-xs font-medium" aria-label="Progress">
+          {STEPS.map(([key, label], i) => (
+            <li key={key} className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${i === stepIndex ? 'bg-ink text-white' : i < stepIndex ? 'bg-primary/15 text-primary' : 'bg-card border text-foreground/50'}`}>
+                <span className="h-4 w-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">{i < stepIndex ? <Check className="h-3 w-3" /> : i + 1}</span>
+                {label}
+              </span>
+              {i < STEPS.length - 1 && <span className="h-px w-4 sm:w-8 bg-foreground/15" />}
+            </li>
           ))}
-        </div>
+        </ol>
 
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-4 space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col">
+        <div className="my-auto w-full space-y-3 py-1">
         {error && (
-          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>
+          <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-2xl">{error}</div>
         )}
 
         {page === 'upload' && (
-          <div className="space-y-4">
-            <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 sm:p-10 text-center cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-primary/5' : 'border-foreground/20 hover:border-primary/40'}`}>
+          <div className="space-y-3">
+            <div {...getRootProps()} className={`rounded-3xl border-2 border-dashed bg-card text-center cursor-pointer transition-colors ${files.length > 0 ? 'p-4' : 'p-[clamp(1.25rem,6vh,2.5rem)]'} ${isDragActive ? 'border-primary bg-primary/5' : 'border-foreground/20 hover:border-primary/50'}`}>
               <input {...getInputProps()} />
-              <Upload className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
-              <p className="text-sm font-medium">Drop files here or click to browse</p>
-              <p className="text-xs text-foreground/50 mt-1">PDF, DOC, DOCX, PPT, XLS, JPG, PNG, ZIP</p>
-              <p className="text-[11px] text-foreground/40 mt-1">Your files go straight to {shop.name} and are permanently deleted one hour after your order is ready.</p>
-              {uploading && <Loader2 className="h-5 w-5 animate-spin mx-auto mt-4 text-primary" />}
+              <span className={`mx-auto rounded-2xl bg-primary/10 flex items-center justify-center ${files.length > 0 ? 'h-9 w-9 mb-2' : 'h-14 w-14 mb-3'}`}>
+                {uploading ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : <Upload className="h-5 w-5 text-primary" />}
+              </span>
+              <p className="text-sm font-semibold">{files.length > 0 ? 'Add more files' : 'Drop files here or tap to browse'}</p>
+              {files.length === 0 && (
+                <>
+                  <p className="text-xs text-foreground/55 mt-1">PDF, DOC, DOCX, PPT, XLS, JPG, PNG, ZIP</p>
+                  <p className="text-[11px] text-foreground/45 mt-2 max-w-xs mx-auto">Your files go straight to {shop.name} and are permanently deleted one hour after your order is ready.</p>
+                </>
+              )}
             </div>
 
             {files.length > 0 && (
               <div className="space-y-2">
                 {files.map((file) => (
-                  <div key={file.id} className="flex items-center gap-3 bg-card rounded-xl border p-4">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div key={file.id} className="flex items-center gap-3 bg-card rounded-2xl border p-3">
+                    <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <FileText className="h-4 w-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -328,7 +371,7 @@ export default function CustomerPortal() {
                     {file.deleteAfter && (
                       <span className="text-xs text-orange-600 flex-shrink-0">{getTimeRemaining(file.deleteAfter)}</span>
                     )}
-                    <button onClick={() => removeFile(file.id)} className="p-1 rounded-md hover:bg-muted text-foreground/40 hover:text-foreground transition-colors">
+                    <button onClick={() => removeFile(file.id)} aria-label="Remove file" className="p-1.5 rounded-lg hover:bg-muted text-foreground/40 hover:text-foreground transition-colors">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
@@ -480,6 +523,7 @@ export default function CustomerPortal() {
             </div>
           </div>
         )}
+        </div>
         </div>
       </div>
     </div>

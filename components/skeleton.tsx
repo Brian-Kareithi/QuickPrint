@@ -120,23 +120,49 @@ export function QueueSkeleton() {
   );
 }
 
-export function ShopPortalSkeleton() {
+export interface ShopHint { open: boolean; bg?: string; brand?: string }
+
+export function ShopPortalSkeleton({ hint }: { hint?: ShopHint | null }) {
+  const closed = hint?.open === false;
+  const bg = hint?.bg || undefined;
+
+  if (closed) {
+    return (
+      <div className="fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: bg }} role="status" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Loading shop…</span>
+        <div className="flex-1 min-h-0 overflow-hidden rounded-3xl bg-panel flex items-center justify-center p-5">
+          <div className="w-full max-w-md flex flex-col items-center gap-3">
+            <div className="h-[clamp(4.5rem,13vh,7rem)] aspect-square rounded-full bg-white/10 animate-pulse" />
+            <div className="h-3 w-28 rounded-full bg-white/10 animate-pulse mt-2" />
+            <div className="h-9 w-64 max-w-full rounded-xl bg-white/10 animate-pulse" />
+            <div className="h-9 w-44 max-w-full rounded-xl bg-white/10 animate-pulse" />
+            <div className="h-3 w-56 max-w-full rounded-full bg-white/10 animate-pulse mt-1" />
+            <div className="w-full space-y-2 mt-3">
+              {[0, 1].map((i) => <div key={i} className="h-12 w-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />)}
+            </div>
+            <div className="h-12 w-full rounded-xl bg-white/15 animate-pulse mt-2" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen" role="status" aria-busy="true" aria-live="polite">
+    <div className="fit-screen overflow-hidden" style={{ backgroundColor: bg }} role="status" aria-busy="true" aria-live="polite">
       <span className="sr-only">Loading shop…</span>
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <Skeleton className="h-12 w-12 rounded-xl" />
-          <Skeleton className="h-5 w-44" />
-          <Skeleton className="h-3 w-64" />
+      <div className="h-full w-full max-w-lg mx-auto flex flex-col gap-3 p-3">
+        <div className="rounded-3xl bg-panel px-4 py-3 flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 animate-pulse" />
+          <div className="space-y-2"><div className="h-4 w-40 rounded-full bg-white/10 animate-pulse" /><div className="h-3 w-56 max-w-full rounded-full bg-white/10 animate-pulse" /></div>
         </div>
-        <div className="flex gap-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="flex-1 h-1 rounded-full" />)}</div>
-        <div className="border-2 border-dashed border-foreground/10 rounded-xl p-12 flex flex-col items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-xl" />
-          <Skeleton className="h-4 w-52" />
-          <Skeleton className="h-3 w-40" />
+        <div className="flex justify-center gap-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-7 w-24 rounded-full" />)}</div>
+        <div className="flex-1 min-h-0 flex flex-col justify-center gap-3">
+          <div className="rounded-3xl border-2 border-dashed border-foreground/10 bg-card p-[clamp(1.25rem,6vh,2.5rem)] flex flex-col items-center gap-3">
+            <Skeleton className="h-14 w-14 rounded-2xl" />
+            <Skeleton className="h-4 w-52" />
+            <Skeleton className="h-3 w-40" />
+          </div>
         </div>
-        <Skeleton className="h-11 w-full rounded-xl" />
       </div>
     </div>
   );
