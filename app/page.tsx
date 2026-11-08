@@ -24,7 +24,7 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="light min-h-screen flex flex-col bg-[#f7f5f0] text-[#003249] selection:bg-[#80ced7]">
+    <div className="light min-h-screen flex flex-col pb-12 bg-[#f7f5f0] text-[#003249] selection:bg-[#80ced7]">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-[#f7f5f0]/80">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Logo />

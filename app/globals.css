@@ -75,7 +75,7 @@
 }
 
 html { font-size: 15px; -webkit-text-size-adjust: 100%; }
-body { overflow-x: hidden; padding-bottom: 2.75rem; }
+body { overflow-x: hidden; }
 @media (max-width: 640px) {
 html { font-size: 14px; }
 

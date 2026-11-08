@@ -14,7 +14,7 @@ import { acceptFor } from '@/lib/file-types';
 import { LogoMark } from '@/components/logo';
 import { paymentOptions, paymentInstructions } from '@/lib/payments';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
-import { Upload, FileText, X, Printer, Check, Loader2 } from 'lucide-react';
+import { Upload, FileText, X, Printer, Check, Loader2, Phone, Mail, MapPin, RefreshCw } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import type { Shop, PriceBreakdown } from '@/types';
 
@@ -225,38 +225,87 @@ export default function CustomerPortal() {
     );
   }
 
+  const brand = shop.branding?.primaryColor || '#007ea7';
+  const pageBg = shop.branding?.backgroundColor || '#fff';
+  const logo = shop.branding?.logoUrl
+    ? <img src={shop.branding.logoUrl} alt="" className="h-full w-full object-cover" />
+    : <LogoMark className="h-full w-full" />;
+
+  if (shop.isAcceptingOrders === false) {
+    const contacts = [
+      shop.phone && { icon: Phone, label: shop.phone, href: `tel:${shop.phone}` },
+      shop.email && { icon: Mail, label: shop.email, href: `mailto:${shop.email}` },
+      shop.address && { icon: MapPin, label: shop.address, href: undefined },
+    ].filter(Boolean) as { icon: typeof Phone; label: string; href?: string }[];
+
+    return (
+      <div className="light-brand fit-screen overflow-hidden relative flex items-center justify-center p-4" style={{ backgroundColor: pageBg }}>
+        <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-20" style={{ backgroundColor: brand }} />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full blur-3xl opacity-15" style={{ backgroundColor: brand }} />
+        <div className="page-enter relative w-full max-w-sm max-h-full overflow-y-auto rounded-[2rem] border bg-card/95 backdrop-blur-sm shadow-[0_20px_50px_-12px_rgba(0,50,73,0.25)] p-6 sm:p-8 text-center">
+          <div className="h-14 w-14 rounded-2xl overflow-hidden mx-auto grayscale opacity-80">{logo}</div>
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-foreground/60">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Closed for now
+          </span>
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight leading-tight">{shop.name} isn&apos;t taking orders right now</h1>
+          <p className="mt-2 text-sm text-foreground/60">
+            Uploads are paused. Please check back a little later and you can send your files straight from your phone.
+          </p>
+          {contacts.length > 0 && (
+            <ul className="mt-5 space-y-2 text-left">
+              {contacts.map((c) => {
+                const inner = (
+                  <>
+                    <span className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brand + '22', color: brand }}><c.icon className="h-4 w-4" /></span>
+                    <span className="text-sm truncate">{c.label}</span>
+                  </>
+                );
+                return (
+                  <li key={c.label}>
+                    {c.href
+                      ? <a href={c.href} className="flex items-center gap-3 rounded-xl border p-2 hover:bg-muted transition-colors">{inner}</a>
+                      : <div className="flex items-center gap-3 rounded-xl border p-2">{inner}</div>}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <button onClick={loadShop}
+            className="mt-5 w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-medium text-white"
+            style={{ backgroundColor: brand, borderRadius: shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? 0 : '0.75rem' }}>
+            <RefreshCw className="h-4 w-4" /> Check again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="light-brand min-h-screen" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+    <div className="light-brand fit-screen overflow-hidden" style={{ backgroundColor: pageBg }}>
       <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
-      <div className="qp-shop max-w-lg mx-auto px-4 py-6 space-y-6">
-        <div className="text-center mb-2">
-          {shop.branding?.logoUrl
-            ? <img src={shop.branding.logoUrl} alt="" className="h-12 w-12 rounded-xl mx-auto mb-3 object-cover" />
-            : <LogoMark className="h-12 w-12 mx-auto mb-3" />}
-          <h1 className="text-lg font-semibold tracking-tight" style={{ color: shop.branding?.primaryColor }}>{shop.name}</h1>
-          <p className="text-sm text-foreground/60">{shop.welcomeMessage || 'Upload your documents for printing'}</p>
+      <div className="qp-shop h-full w-full max-w-lg mx-auto px-4 pt-4 flex flex-col gap-3">
+        <div className="flex-shrink-0 flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl overflow-hidden flex-shrink-0">{logo}</div>
+          <div className="min-w-0">
+            <h1 className="text-base font-semibold tracking-tight truncate" style={{ color: shop.branding?.primaryColor }}>{shop.name}</h1>
+            <p className="text-xs text-foreground/60 truncate">{shop.welcomeMessage || 'Upload your documents for printing'}</p>
+          </div>
         </div>
 
-        <div className="flex gap-2 mb-4">
+        <div className="flex-shrink-0 flex gap-2">
           {['upload', 'options', 'review'].map((p) => (
             <div key={p} className={`flex-1 h-1 rounded-full ${page === p ? 'bg-primary' : 'bg-muted'}`} />
           ))}
         </div>
 
-        {shop.isAcceptingOrders === false && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-900 text-sm p-4 rounded-xl text-center">
-            <p className="font-semibold">{shop.name} isn&apos;t taking new orders right now</p>
-            <p className="text-xs mt-1 text-amber-800/80">Please check back a little later{shop.phone ? ` or call ${shop.phone}` : ''}.</p>
-          </div>
-        )}
-
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-4 space-y-4">
         {error && (
           <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>
         )}
 
         {page === 'upload' && (
           <div className="space-y-4">
-            <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-primary/5' : 'border-foreground/20 hover:border-primary/40'}`}>
+            <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 sm:p-10 text-center cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-primary/5' : 'border-foreground/20 hover:border-primary/40'}`}>
               <input {...getInputProps()} />
               <Upload className="h-10 w-10 text-foreground/30 mx-auto mb-3" />
               <p className="text-sm font-medium">Drop files here or click to browse</p>
@@ -431,6 +480,7 @@ export default function CustomerPortal() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
