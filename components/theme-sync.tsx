@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { isPortalPath } from '@/lib/portal-theme';
 
-/** Keeps the dark class in step with navigation: on in the portal (if chosen), always off on public pages. */
 export function ThemeSync() {
   const pathname = usePathname() || '';
   useEffect(() => {

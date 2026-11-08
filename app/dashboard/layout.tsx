@@ -19,7 +19,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (loading || authError) return;
     if (!isAuthenticated) router.push('/auth/login');
-    // Super admins and customers have their own areas.
     else if (user && (user.role === 'ADMIN' || user.role === 'CUSTOMER')) router.replace(homeFor(user));
   }, [loading, authError, isAuthenticated, user, router]);
 
@@ -37,7 +36,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     );
   }
-  // Redirecting (not signed in, or belongs to another area): keep the frame instead of a blank screen
   if (!isAuthenticated || !user || user.role === 'ADMIN' || user.role === 'CUSTOMER') return <ShellSkeleton />;
 
   const isCashier = user.role === 'STAFF';

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { applyTheme } from '@/lib/theme';
 import { useAuth } from '@/lib/auth-context';
+import { acceptFor } from '@/lib/file-types';
 import { LogoMark } from '@/components/logo';
 import { paymentOptions, paymentInstructions } from '@/lib/payments';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
@@ -20,7 +21,6 @@ import type { Shop, PriceBreakdown } from '@/types';
 const inputClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 const selectClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
-/** Best-effort page count for PDFs (counts page objects). The customer can correct it. */
 async function detectPdfPages(file: File): Promise<number> {
   if (!file.name.toLowerCase().endsWith('.pdf')) return 1;
   try {
@@ -101,7 +101,7 @@ export default function CustomerPortal() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop, disabled: uploading || !shop || shop.isAcceptingOrders === false,
-    accept: {
+    accept: acceptFor(shop?.allowedFileTypes) ?? {
       'application/pdf': ['.pdf'], 'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
       'application/vnd.ms-powerpoint': ['.ppt', '.pptx'],
@@ -177,7 +177,6 @@ export default function CustomerPortal() {
   const firstDelete = files.find((f) => f.deleteAfter)?.deleteAfter;
   const retentionLabel = firstDelete ? getTimeRemaining(firstDelete) : '1 hour';
 
-  // Skeleton while the shop loads (what a customer sees right after scanning the QR code)
   if (shopLoading) return <ShopPortalSkeleton />;
 
   if (!shop) {

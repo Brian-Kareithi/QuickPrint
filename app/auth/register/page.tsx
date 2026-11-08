@@ -11,7 +11,6 @@ import { homeFor } from '@/lib/roles';
 
 type FieldKey = 'name' | 'email' | 'password' | 'phone';
 
-// label, input type, autocomplete hint, placeholder
 const FIELDS: Record<FieldKey, [string, string, string, string]> = {
   name: ['Full name', 'text', 'name', 'Enter your name'],
   email: ['Email', 'email', 'email', 'you@example.com'],
@@ -43,12 +42,12 @@ export default function RegisterPage() {
 
   return (
     <AuthShell title="Create your account" subtitle={accountType === 'OWNER' ? 'Start managing your print shop.' : 'Track your print orders.'}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="auth-form">
         {error && <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-xl">{error}</div>}
-        <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-xl">
+        <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-xl flex-shrink-0">
           {([['OWNER', 'Shop owner'], ['CUSTOMER', 'Customer']] as const).map(([v, l]) => (
             <button type="button" key={v} onClick={() => setAccountType(v)}
-              className={`h-10 rounded-lg text-sm font-medium transition-colors ${accountType === v ? 'bg-card shadow-sm' : 'text-foreground/60'}`}>
+              className={`h-9 sm:h-10 rounded-lg text-sm font-medium transition-colors ${accountType === v ? 'bg-card shadow-sm' : 'text-foreground/60'}`}>
               {l}
             </button>
           ))}
@@ -62,7 +61,7 @@ export default function RegisterPage() {
           );
         })}
         <button type="submit" disabled={loading}
-          className="w-full h-12 bg-ink text-white rounded-xl text-sm font-medium hover:bg-ink/90 transition-colors disabled:opacity-60 shadow-md shadow-[#003249]/20 inline-flex items-center justify-center gap-2">
+          className="w-full auth-input bg-ink text-white rounded-xl text-sm font-medium hover:bg-ink/90 transition-colors disabled:opacity-60 shadow-md shadow-[#003249]/20 inline-flex items-center justify-center gap-2">
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           {loading ? 'Creating account...' : 'Create account'}
         </button>

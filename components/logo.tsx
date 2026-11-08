@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 
-/** QuickPrint mark: a sheet leaving a printer. Uses the shop/theme primary colour. */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn('h-8 w-8 flex-shrink-0', className)} aria-hidden="true">

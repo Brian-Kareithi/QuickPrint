@@ -8,7 +8,6 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  /** Set when the session check failed because the server could not be reached (not a bad login). */
   authError: string;
   retryAuth: () => void;
   login: (email: string, password: string) => Promise<User>;
@@ -42,8 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api.auth.me()
       .then(setUser)
       .catch((err) => {
-        // Only an invalid/expired login signs the user out. A network problem keeps the session
-        // and shows a retry instead of bouncing the user to the login page.
         if (err?.status === 401 || err?.status === 403) {
           localStorage.removeItem('token');
           setToken(null);
@@ -74,7 +71,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.user as User;
   };
 
-  // Re-read the signed-in user (after editing the profile)
   const refresh = async () => {
     setUser(await api.auth.me());
   };

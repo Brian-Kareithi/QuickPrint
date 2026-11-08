@@ -3,7 +3,6 @@
 import { CloudOff, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-/** Shown instead of a skeleton when loading fails or times out, so the screen is never stuck. */
 export function ErrorState({
   title = 'Something went wrong',
   message,

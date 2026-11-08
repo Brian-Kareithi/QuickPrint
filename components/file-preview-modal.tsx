@@ -25,11 +25,6 @@ const LABEL: Record<string, string> = {
   STAPLING: 'Staple', LAMINATION: 'Laminate', FOLDING: 'Fold', HOLE_PUNCH: 'Hole punch',
 };
 
-/**
- * Lets the cashier look inside a customer's file before printing ("is this the right document?").
- * PDFs and images open natively, Word (.docx) files are rendered in the browser. Nothing is sent
- * to a third party: the file is fetched from our own server with the cashier's login.
- */
 export function FilePreviewModal({ item, order, onClose }: { item: any; order?: any; onClose: () => void }) {
   const upload = item.upload;
   const kind = kindOf(upload.originalName, upload.mimeType || '');
@@ -64,7 +59,6 @@ export function FilePreviewModal({ item, order, onClose }: { item: any; order?: 
     return () => { cancelled = true; if (revoke) URL.revokeObjectURL(revoke); };
   }, [upload.id, kind]);
 
-  // Close with Esc, and stop the page behind from scrolling
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);

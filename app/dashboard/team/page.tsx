@@ -61,7 +61,6 @@ export default function TeamPage() {
     }
   };
 
-  // Give a cashier a fresh temporary password (e.g. they forgot theirs) and show it once.
   const resetPassword = async (userId: string, name: string, email: string) => {
     if (!shopId || !confirm(`Set a new temporary password for ${name}? Their old password will stop working.`)) return;
     const password = randomPassword();

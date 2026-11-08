@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Printer, Loader2, Eye } from 'lucide-react';
+import { Printer, Loader2, Eye, Download } from 'lucide-react';
 import { api } from '@/lib/api';
 import { FilePreviewModal } from '@/components/file-preview-modal';
 
-/**
- * Preview + Print for a customer's uploaded file (shop staff only).
- * Files are permanently deleted shortly after the order is finished.
- */
 export function PrintFileButton({ item, order }: { item: any; order?: any }) {
   const [busy, setBusy] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [preview, setPreview] = useState(false);
   const upload = item.upload;
   const gone = !item.uploadId || !upload || upload.isDeleted;
@@ -35,6 +32,19 @@ export function PrintFileButton({ item, order }: { item: any; order?: any }) {
         }}
       >
         {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Printer className="h-3 w-3" />} Print
+      </button>
+      <button
+        disabled={downloading}
+        className={btn}
+        title="Download the original file to edit it, then print"
+        onClick={async () => {
+          setDownloading(true);
+          try { await api.uploads.download(upload.id, item.fileName || upload.originalName || 'document'); }
+          catch (err: any) { alert(err.message || 'Could not download file'); }
+          finally { setDownloading(false); }
+        }}
+      >
+        {downloading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />} Download
       </button>
       {preview && <FilePreviewModal item={item} order={order} onClose={() => setPreview(false)} />}
     </span>

@@ -3,7 +3,7 @@ export interface User {
   email: string;
   phone?: string;
   name: string;
-  role: 'OWNER' | 'STAFF' | 'ADMIN' | 'CUSTOMER'; // ADMIN = super admin, OWNER = shop owner, STAFF = cashier
+  role: 'OWNER' | 'STAFF' | 'ADMIN' | 'CUSTOMER';
   avatarUrl?: string;
   clerkId?: string;
   isSuspended?: boolean;

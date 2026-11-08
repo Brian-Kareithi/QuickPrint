@@ -1,11 +1,9 @@
 import { cn } from '@/lib/utils';
 
-/** A pulsing placeholder block. Compose these to mirror the real layout while data loads. */
 export function Skeleton({ className }: { className?: string }) {
   return <div aria-hidden="true" className={cn('animate-pulse rounded-lg bg-foreground/10', className)} />;
 }
 
-/** Wrapper that announces loading to screen readers. */
 function Busy({ children, className, label = 'Loading' }: { children: React.ReactNode; className?: string; label?: string }) {
   return (
     <div role="status" aria-busy="true" aria-live="polite" className={className}>
@@ -28,10 +26,8 @@ export function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
-/** Rows like a list of people / orders / shops. */
 export function ListSkeleton({ rows = 5, avatar = true, bare = false }: { rows?: number; avatar?: boolean; bare?: boolean }) {
   return (
-    // `bare` skips the card frame, for use inside an existing bordered container
     <Busy className={bare ? '' : 'bg-card rounded-2xl border overflow-hidden'}>
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="p-4 border-b last:border-0 flex items-center gap-3">
@@ -62,7 +58,6 @@ export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: nu
   );
 }
 
-/** Settings-style form: a title, a card with labelled fields and a button. */
 export function FormSkeleton({ fields = 5 }: { fields?: number }) {
   return (
     <Busy className="max-w-2xl space-y-4">
@@ -77,7 +72,6 @@ export function FormSkeleton({ fields = 5 }: { fields?: number }) {
   );
 }
 
-/** Dashboard overview: banner, stat cards, two panels. */
 export function DashboardSkeleton() {
   return (
     <Busy className="space-y-5">
@@ -91,7 +85,6 @@ export function DashboardSkeleton() {
   );
 }
 
-/** Charts page. */
 export function ChartsSkeleton() {
   return (
     <Busy className="space-y-5">
@@ -104,7 +97,6 @@ export function ChartsSkeleton() {
   );
 }
 
-/** Three-column print queue. */
 export function QueueSkeleton() {
   return (
     <Busy className="space-y-4">
@@ -128,7 +120,6 @@ export function QueueSkeleton() {
   );
 }
 
-/** What a customer sees right after scanning a shop's QR code, until the shop loads. */
 export function ShopPortalSkeleton() {
   return (
     <div className="min-h-screen" role="status" aria-busy="true" aria-live="polite">
@@ -151,7 +142,6 @@ export function ShopPortalSkeleton() {
   );
 }
 
-/** Whole signed-in frame (sidebar + topbar + content) while the session is checked. */
 export function ShellSkeleton() {
   return (
     <div className="min-h-screen" role="status" aria-busy="true" aria-live="polite">

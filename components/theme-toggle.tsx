@@ -4,10 +4,6 @@ import { useEffect, useState, type MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { Sun, Moon } from 'lucide-react';
 
-/**
- * Light/dark switch. Where the browser supports View Transitions the new theme
- * expands as a circle from the button; elsewhere it swaps instantly.
- */
 export function ThemeToggle({ className = '' }: { className?: string }) {
   const [dark, setDark] = useState(false);
 

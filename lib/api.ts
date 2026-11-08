@@ -1,12 +1,6 @@
-// The API serves everything under /api; tolerate a configured URL that forgot the suffix.
 const RAW_API = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/[/]+$/, '');
 const API_BASE = RAW_API.endsWith('/api') ? RAW_API : `${RAW_API}/api`;
 
-/**
- * Public address of this web app, encoded into shop QR codes. Set NEXT_PUBLIC_APP_URL to
- * something a customer's phone can reach (LAN IP or the deployed domain) - "localhost"
- * only works on the machine running the app.
- */
 export function getAppUrl(): string {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
   if (configured) return configured.replace(/\/+$/, '');
@@ -18,7 +12,6 @@ const authHeader = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-/** An API failure. `status` is the HTTP status, or 0 when the server could not be reached at all. */
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status = 0) {
@@ -39,7 +32,6 @@ async function errorMessage(res: Response): Promise<string> {
   return (Array.isArray(msg) ? msg.join(', ') : msg) || `Request failed (HTTP ${res.status})`;
 }
 
-/** fetch with a timeout and readable errors, so no screen can wait forever. */
 async function timedFetch(url: string, init: RequestInit = {}, ms = REQUEST_TIMEOUT_MS): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
@@ -105,6 +97,8 @@ export const api = {
       request<any>(`/shops/${id}/staff/${userId}/password`, { method: 'PATCH', body: JSON.stringify({ password }) }),
     removeStaff: (id: string, userId: string) =>
       request<any>(`/shops/${id}/staff/${userId}`, { method: 'DELETE' }),
+    updateFileTypes: (id: string, data: { extension: string; mimeType: string }[]) =>
+      request<any>(`/shops/${id}/file-types`, { method: 'PUT', body: JSON.stringify(data) }),
     updateServices: (id: string, data: any[]) =>
       request<any>(`/shops/${id}/services`, { method: 'PUT', body: JSON.stringify(data) }),
   },
@@ -144,15 +138,25 @@ export const api = {
     },
     list: (shopId: string) => request<any[]>(`/uploads/shop/${shopId}`),
     get: (id: string) => request<any>(`/uploads/${id}`),
-    /** Fetch a customer's file (shop staff only) as a Blob, for the in-app preview. */
     blob: async (id: string) => {
       const res = await timedFetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() }, 60000);
       if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
       return res.blob();
     },
-    /** Fetch a customer's file (owner only) and open it in a new tab so it can be printed. */
+    download: async (id: string, fileName: string) => {
+      const res = await timedFetch(`${API_BASE}/uploads/${id}/download?download=1`, { headers: authHeader() }, 60000);
+      if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
+      const url = URL.createObjectURL(await res.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    },
     open: async (id: string) => {
-      const win = window.open('', '_blank'); // opened synchronously so popup blockers allow it
+      const win = window.open('', '_blank');
       try {
         const res = await timedFetch(`${API_BASE}/uploads/${id}/download`, { headers: authHeader() }, 60000);
         if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
@@ -218,6 +222,8 @@ export const api = {
     orders: (shopId: string, days = 30) => request<any[]>(`/analytics/orders/${shopId}?days=${days}`),
     hours: (shopId: string) => request<any[]>(`/analytics/hours/${shopId}`),
     printer: (shopId: string) => request<any>(`/analytics/printer/${shopId}`),
+    track: (shopId: string, eventType: string, value?: number, metadata?: any) =>
+      request<any>(`/analytics/track/${shopId}`, { method: 'POST', body: JSON.stringify({ eventType, value, metadata }) }).catch(() => {}),
   },
   admin: {
     stats: () => request<any>('/admin/stats'),

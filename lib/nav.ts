@@ -6,7 +6,6 @@ import type { NavItem } from '@/components/app-shell';
 
 const profile: NavItem = { href: '/profile', icon: UserCircle, label: 'My profile' };
 
-/** Sidebar entries and role label for each kind of account. */
 export function navFor(role: string): { nav: NavItem[]; roleLabel: string } {
   switch (role) {
     case 'ADMIN':

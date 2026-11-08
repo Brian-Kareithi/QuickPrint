@@ -46,7 +46,6 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* Hero */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 py-8 min-h-[calc(100svh-4rem)] grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-8 items-center content-center">
           <div>
             <p className="text-xs font-medium tracking-[0.18em] uppercase text-[#007ea7] mb-5">Print shop software</p>
@@ -68,7 +67,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* A paper-stack of what an order looks like */}
           <div className="relative mx-auto w-full max-w-sm h-[20rem] sm:h-[23rem] lg:h-[min(25rem,52vh)] lg:min-h-[21rem]" aria-hidden="true">
             <div className="absolute inset-x-6 top-6 h-full rounded-3xl bg-[#9ad1d4]/40 rotate-[5deg]" />
             <div className="absolute inset-x-3 top-3 h-full rounded-3xl bg-white/70 border border-[#003249]/10 -rotate-[3deg]" />
@@ -105,7 +103,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How it works */}
         <section className="border-y border-[#003249]/10">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
             <h2 className="font-display text-4xl sm:text-5xl tracking-tight max-w-lg">Three steps, no paperwork.</h2>
@@ -121,7 +118,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
           <div className="max-w-xl">
             <p className="text-xs font-medium tracking-[0.18em] uppercase text-[#007ea7] mb-4">Built for African print shops</p>
@@ -142,7 +138,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Closing call to action */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 pb-24">
           <div className="relative overflow-hidden rounded-[2rem] bg-[#003249] text-white px-7 py-14 sm:px-14 sm:py-16 text-center sm:text-left sm:flex items-center justify-between gap-8">
             <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#007ea7]/40 blur-3xl" />

@@ -12,7 +12,6 @@ import { Search, ChevronDown, UserRoundCog, Check } from 'lucide-react';
 
 type Filter = '' | 'active' | 'suspended';
 
-/** Pick a shop owner account to hand a business over to. */
 function OwnerPicker({ shop, onDone, onCancel }: { shop: any; onDone: (updated: any) => void; onCancel: () => void }) {
   const [q, setQ] = useState('');
   const [owners, setOwners] = useState<any[] | null>(null);

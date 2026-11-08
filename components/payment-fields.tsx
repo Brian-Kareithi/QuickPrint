@@ -20,7 +20,6 @@ export const emptyPayment: PaymentValues = {
   airtelNumber: '', bankName: '', bankAccountName: '', bankAccountNumber: '', paymentNotes: '',
 };
 
-/** Build form values from a saved shop. */
 export function paymentFromShop(shop: Record<string, any>): PaymentValues {
   return {
     acceptCash: shop.acceptCash !== false,

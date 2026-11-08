@@ -9,7 +9,6 @@ import { LogoMark } from '@/components/logo';
 import { PaymentFields, emptyPayment, type PaymentValues } from '@/components/payment-fields';
 import type { Shop } from '@/types';
 
-/** First-run form: the owner creates their business (their own isolated shop on the platform). */
 export function OnboardingForm({ onCreated }: { onCreated: (shop: Shop) => void }) {
   const { user } = useAuth();
   const [form, setForm] = useState({

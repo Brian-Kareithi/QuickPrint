@@ -24,16 +24,11 @@ interface Props {
   children: ReactNode;
 }
 
-/**
- * Floating sidebar + floating topbar used by every signed-in area
- * (shop owner / cashier dashboard, super admin, customer).
- */
 export function AppShell({ nav, title, user, roleLabel, onLogout, showNotifications, children }: Props) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
 
-  // Unread notification count for the bell
   useEffect(() => {
     if (!showNotifications) return;
     let alive = true;
@@ -49,10 +44,9 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
     href === '/dashboard' || href === '/admin' || href === '/my-orders' ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-[calc(100dvh-2.75rem)] overflow-hidden">
       {open && <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden" onClick={() => setOpen(false)} />}
 
-      {/* Floating sidebar */}
       <aside
         className={`fixed z-50 top-3 bottom-3 left-3 w-60 max-w-[85vw] rounded-3xl bg-card text-foreground shadow-[0_8px_30px_rgba(0,50,73,0.10)] flex flex-col transition-transform duration-300 ease-out ${
           open ? 'translate-x-0' : '-translate-x-[110%]'
@@ -100,9 +94,8 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
         </div>
       </aside>
 
-      <div className="lg:pl-[16.5rem] lg:pr-5 min-w-0">
-        {/* Floating topbar */}
-        <header className="sticky top-3 z-30 mx-3 lg:mx-0 h-14 rounded-3xl bg-card/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,50,73,0.07)] flex items-center px-4 gap-3">
+      <div className="lg:pl-[16.5rem] lg:pr-5 min-w-0 h-full flex flex-col">
+        <header className="relative z-30 flex-shrink-0 mt-3 mx-3 lg:mx-0 h-14 rounded-3xl bg-card/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,50,73,0.07)] flex items-center px-4 gap-3">
           <button onClick={() => setOpen(true)} className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-muted">
             <Menu className="h-5 w-5" />
           </button>
@@ -121,7 +114,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
           )}
         </header>
 
-        <main key={pathname} className="page-enter px-3 py-4 sm:py-5 lg:px-0 lg:py-6 pb-10 min-w-0">
+        <main key={pathname} className="page-enter flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-4 sm:py-5 lg:px-0 lg:py-5 min-w-0">
           {children}
         </main>
       </div>

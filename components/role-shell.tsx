@@ -8,7 +8,6 @@ import { AppShell } from '@/components/app-shell';
 import { ShellSkeleton } from '@/components/skeleton';
 import { ErrorState } from '@/components/error-state';
 
-/** Signed-in page frame for screens every role can open (profile, notifications). */
 export function RoleShell({ title, children }: { title: string; children: ReactNode }) {
   const { user, isAuthenticated, loading, logout, authError, retryAuth } = useAuth();
   const router = useRouter();

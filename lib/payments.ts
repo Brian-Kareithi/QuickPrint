@@ -5,7 +5,6 @@ export interface PaymentOption {
   label: string;
 }
 
-/** Payment methods this shop has actually set up. */
 export function paymentOptions(shop: Pick<Shop, 'acceptCash' | 'mpesaNumber' | 'airtelNumber'>): PaymentOption[] {
   const opts: PaymentOption[] = [];
   if (shop.acceptCash !== false) opts.push({ value: 'CASH_ON_PICKUP', label: 'Cash on pickup' });
@@ -15,7 +14,6 @@ export function paymentOptions(shop: Pick<Shop, 'acceptCash' | 'mpesaNumber' | '
   return opts;
 }
 
-/** Human-readable "how to pay" lines for the chosen method. */
 export function paymentInstructions(shop: Shop, method: string, amount?: number): string[] {
   const lines: string[] = [];
   if (method === 'MPESA' && shop.mpesaNumber) {

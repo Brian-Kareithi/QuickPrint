@@ -136,7 +136,6 @@ export default function QueuePage() {
   const toggleSound = () => {
     const next = !sound;
     if (next) {
-      // Browsers only allow audio after a click, so it is created here.
       const Ctx = window.AudioContext || (window as any).webkitAudioContext;
       audioRef.current = audioRef.current || new Ctx();
       audioRef.current.resume();
@@ -153,7 +152,6 @@ export default function QueuePage() {
         const shopId = shops[0].id;
         const [q, r] = await Promise.all([api.orders.queue(shopId), api.orders.ready(shopId)]);
         const ids = q.awaiting.map((o: any) => o.id);
-        // Chime when an order we haven't seen arrives (not on first load)
         if (seenRef.current && soundRef.current && ids.some((id: string) => !seenRef.current!.has(id))) beep();
         seenRef.current = new Set(ids);
         setQueue(q);
@@ -169,11 +167,10 @@ export default function QueuePage() {
 
   useEffect(() => {
     loadQueue();
-    const t = setInterval(loadQueue, 10000); // pick up new customer orders
+    const t = setInterval(loadQueue, 10000);
     return () => clearInterval(t);
   }, [loadQueue]);
 
-  // Show the waiting count in the browser tab so it's visible while working in another tab
   useEffect(() => {
     const n = queue.awaiting.length;
     document.title = n > 0 ? `(${n}) Print queue · QuickPrint` : 'Print queue · QuickPrint';

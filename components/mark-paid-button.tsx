@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { CircleDollarSign, Check } from 'lucide-react';
 import { api } from '@/lib/api';
 
-/** Cashier confirms the customer has paid (or reverses it). Calls onChange with the updated order. */
 export function MarkPaidButton({ order, onChange }: { order: any; onChange?: (o: any) => void }) {
   const [busy, setBusy] = useState(false);
   const paid = !!order.isPaid;

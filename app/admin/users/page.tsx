@@ -36,7 +36,6 @@ export default function AdminUsers() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
 
-  // Debounce the search box
   useEffect(() => {
     const t = setTimeout(() => { setQ(search); setPage(1); }, 300);
     return () => clearTimeout(t);

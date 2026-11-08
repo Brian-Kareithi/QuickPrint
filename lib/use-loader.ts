@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Load data once (and on demand) with explicit loading / error states.
- * Because every API call has a timeout, `loading` always ends - on success or with an error to show.
- */
 export function useLoader<T>(fetcher: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
