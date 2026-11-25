@@ -23,7 +23,6 @@ import type { Shop, PriceBreakdown } from '@/types';
 const inputClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 const selectClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
-/** The shop's background colour, slightly translucent so the ambient glass backdrop shows through. */
 const tint = (color: string) => `color-mix(in srgb, ${color} 78%, transparent)`;
 
 async function detectPdfPages(file: File): Promise<number> {
@@ -218,6 +217,14 @@ export default function CustomerPortal() {
             <Check className="h-1/2 w-1/2 text-green-600" />
           </div>
           <div>
+            {orderResult.customerName && (
+              <p className="text-base font-medium mb-1">
+                Hello {orderResult.customerName} {orderResult.aliasEmoji || '👋'}
+              </p>
+            )}
+            {orderResult.aliasEmoji && (
+              <p className="text-[11px] text-foreground/60 mb-2">That&apos;s your name for today. {shop.name} will call you by it.</p>
+            )}
             <h1 className="text-xl font-semibold tracking-tight">Order placed!</h1>
             <p className="text-[clamp(1.5rem,4.5vh,1.875rem)] font-bold text-primary mt-1 tracking-tight">{orderResult.orderNumber}</p>
             <p className="text-xs text-foreground/60 mt-1">Save this order number</p>
@@ -237,7 +244,7 @@ export default function CustomerPortal() {
           <p className="text-[11px] text-foreground/50">{user ? 'This order is saved to your account.' : 'Sign in or create a customer account with the same email to see this order in your account.'} Your files are permanently deleted one hour after your order is ready.</p>
           <p className="text-[11px] text-foreground/60">Sent the wrong file or want to cancel? Tap the chat button to message {shop.name}.</p>
         </div>
-        <CustomerChat shop={shop} orderNumber={orderResult.orderNumber} customerName={orderForm.customerName || undefined} />
+        <CustomerChat shop={shop} orderNumber={orderResult.orderNumber} customerName={orderResult.customerName || undefined} />
       </div>
     );
   }
@@ -492,7 +499,7 @@ export default function CustomerPortal() {
             <div className="bg-card rounded-xl border p-5 space-y-4">
               <h3 className="text-sm font-semibold">Your details</h3>
               {[
-                { label: 'Name', key: 'customerName', type: 'text', placeholder: 'John Doe' },
+                { label: 'Name', key: 'customerName', type: 'text', placeholder: "Optional, or we'll pick a fun one" },
                 { label: 'Email', key: 'customerEmail', type: 'email', placeholder: 'john@example.com' },
                 { label: 'Phone', key: 'customerPhone', type: 'tel', placeholder: '+254 700 000 000' },
               ].map((field) => (

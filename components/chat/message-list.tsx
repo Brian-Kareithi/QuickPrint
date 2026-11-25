@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { formatTime } from '@/lib/utils';
 import type { ChatMessage } from '@/lib/chat';
 
-/** Chat bubbles. `mine` decides which side counts as "me" (customer or shop). */
 export function MessageList({ messages, mine, className = '' }: { messages: ChatMessage[]; mine: 'CUSTOMER' | 'SHOP'; className?: string }) {
   const end = useRef<HTMLDivElement>(null);
 

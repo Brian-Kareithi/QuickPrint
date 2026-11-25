@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, LogOut, Bell } from 'lucide-react';
 import { Logo } from '@/components/logo';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { api } from '@/lib/api';
 import { useTabBadge } from '@/lib/use-tab-badge';
 
@@ -40,7 +39,6 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
         if (!alive) return;
         const fresh = n.filter((x: any) => !x.read);
         setUnread(fresh.length);
-        // Chat messages are counted from the Messages badge instead, so don't count them twice.
         setUnreadOther(fresh.filter((x: any) => x.type !== 'CHAT_MESSAGE').length);
       })
       .catch(() => {});
@@ -49,7 +47,6 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
     return () => { alive = false; clearInterval(t); };
   }, [showNotifications, pathname]);
 
-  // "(3) QuickPrint" + a red badge on the tab icon for unread notifications and chat messages.
   useTabBadge((showNotifications ? unreadOther : 0) + nav.reduce((n, item) => n + (item.badge || 0), 0));
 
   const isActive = (href: string) =>
@@ -118,7 +115,6 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
           </button>
           <h2 className="text-base font-semibold truncate">{title}</h2>
           <div className="flex-1" />
-          <ThemeToggle />
           {showNotifications && (
             <Link href="/notifications" title="Notifications" className="relative p-2 rounded-xl hover:bg-muted transition-colors">
               <Bell className="h-4 w-4" />

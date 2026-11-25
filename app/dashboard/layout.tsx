@@ -40,7 +40,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     window.addEventListener('qp:chat-activity', load);
     return () => { alive = false; clearInterval(t); window.removeEventListener('qp:chat-activity', load); };
   }, [shopId]);
-  // Live: the chat listener pings this whenever a message or read-state changes.
   const refreshUnread = useCallback(() => { window.dispatchEvent(new Event('qp:chat-activity')); }, []);
 
   if (loading) return <ShellSkeleton />;

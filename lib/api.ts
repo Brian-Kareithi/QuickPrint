@@ -60,7 +60,6 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-/** Origin of the API server (no /api), used for Socket.IO connections. */
 export const API_ORIGIN = API_BASE.replace(/\/api$/, '');
 
 const chatHeaders = (token: string) => ({ 'X-Chat-Token': token });

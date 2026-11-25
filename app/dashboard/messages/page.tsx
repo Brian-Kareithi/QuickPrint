@@ -38,7 +38,6 @@ function Avatar({ c, size = 'h-10 w-10' }: { c: Conversation; size?: string }) {
   );
 }
 
-// useSearchParams needs a Suspense boundary for static rendering.
 export default function MessagesPage() {
   return <Suspense fallback={<MessagesSkeleton />}><MessagesInbox /></Suspense>;
 }
@@ -55,7 +54,6 @@ function MessagesInbox() {
   const [threadLoading, setThreadLoading] = useState(false);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
-  // Desktop notifications need the browser's permission; offer a button until it's been answered.
   const [alertsAsk, setAlertsAsk] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setAlertsAsk(typeof Notification !== 'undefined' && Notification.permission === 'default'), 0);
@@ -65,7 +63,7 @@ function MessagesInbox() {
   const activeRef = useRef<string | null>(null);
   useEffect(() => {
     activeRef.current = activeId;
-    chatPresence.conversationId = activeId; // the global listener won't toast this conversation
+    chatPresence.conversationId = activeId;
     return () => { chatPresence.conversationId = null; };
   }, [activeId]);
 
@@ -101,7 +99,6 @@ function MessagesInbox() {
     }
   }, []);
 
-  // Open a specific chat from a link, e.g. /dashboard/messages?c=<conversationId>.
   const linkedId = useSearchParams().get('c');
   useEffect(() => {
     if (!shopId || !linkedId) return;
@@ -109,7 +106,6 @@ function MessagesInbox() {
     return () => clearTimeout(t);
   }, [shopId, linkedId, openThread]);
 
-  // Live updates for the whole shop inbox.
   useEffect(() => {
     if (!shopId) return;
     const jwt = localStorage.getItem('token');
@@ -124,7 +120,6 @@ function MessagesInbox() {
     socket.on('chat:message', (m: ChatMessage) => {
       if (m.conversationId !== activeRef.current) return;
       setMessages((prev) => mergeMessages(prev, [m]));
-      // We're looking at it, so tell the server it's read.
       if (m.sender === 'CUSTOMER') api.chat.get(m.conversationId, m.createdAt).catch(() => {});
     });
     const poll = setInterval(() => loadList(shopId), 30000);
@@ -165,7 +160,6 @@ function MessagesInbox() {
 
   return (
     <div className="h-full min-h-[30rem] flex gap-4">
-      {/* Inbox */}
       <section className={`${activeId ? 'hidden md:flex' : 'flex'} w-full md:w-80 flex-shrink-0 flex-col bg-card rounded-3xl border overflow-hidden`}>
         <div className="p-4 pb-3 border-b">
           <div className="flex items-center justify-between">
@@ -214,7 +208,6 @@ function MessagesInbox() {
         </ul>
       </section>
 
-      {/* Thread: messages scroll underneath a floating glass header and a floating composer. */}
       <section className={`${activeId ? 'flex' : 'hidden md:flex'} relative flex-1 min-w-0 flex-col bg-card rounded-3xl border overflow-hidden`}>
         {!active ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-foreground/55">

@@ -1,16 +1,10 @@
 import type { CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Loading placeholders that mirror the real layouts (same card radii, borders and surfaces),
- * so pages don't jump when data arrives. Shimmer in light mode, flat pulse in dark mode
- * (see .skeleton in globals.css).
- */
 export function Skeleton({ className, style }: { className?: string; style?: CSSProperties }) {
   return <div aria-hidden="true" className={cn('skeleton rounded-xl', className)} style={style} />;
 }
 
-/** Skeleton block for use on the deep-blue brand panel. */
 function PanelBone({ className }: { className?: string }) {
   return <div aria-hidden="true" className={cn('skeleton skeleton-on-panel rounded-xl', className)} />;
 }
@@ -145,7 +139,6 @@ export function QueueSkeleton() {
   );
 }
 
-/** Two-pane chat inbox (/dashboard/messages). Collapses to the list on phones. */
 export function MessagesSkeleton() {
   return (
     <Busy className="h-full min-h-[30rem] flex gap-4" label="Loading chats">
@@ -174,7 +167,6 @@ export function MessagesSkeleton() {
   );
 }
 
-/** Alternating chat bubbles while a conversation loads. */
 export function ChatBubblesSkeleton() {
   const rows: [boolean, string][] = [[false, 'w-2/3'], [true, 'w-1/2'], [false, 'w-3/5'], [true, 'w-2/5']];
   return (
@@ -235,12 +227,11 @@ export function ShopPortalSkeleton({ hint }: { hint?: ShopHint | null }) {
   );
 }
 
-/** Mirrors AppShell: floating sidebar card + floating header bar + dashboard content. */
 export function ShellSkeleton() {
   return (
     <div className="fit-screen overflow-hidden" role="status" aria-busy="true" aria-live="polite">
       <span className="sr-only">Loading…</span>
-      <aside className="hidden lg:flex fixed top-3 bottom-3 left-3 w-60 rounded-3xl bg-card shadow-[0_8px_30px_rgba(0,50,73,0.10)] dark:border flex-col p-3 gap-1">
+      <aside className="hidden lg:flex fixed top-3 bottom-3 left-3 w-60 rounded-3xl bg-card shadow-[0_8px_30px_rgba(0,50,73,0.10)] flex-col p-3 gap-1">
         <div className="flex items-center gap-2.5 h-14 px-1"><Skeleton className="h-7 w-7 rounded-lg" /><Skeleton className="h-4 w-24 rounded-full" /></div>
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="flex items-center gap-3 px-3.5 py-2.5"><Skeleton className="h-4 w-4 rounded-md" /><Skeleton className="h-3.5 rounded-full" style={{ width: 60 + ((i * 23) % 50) }} /></div>
@@ -252,7 +243,7 @@ export function ShellSkeleton() {
         </div>
       </aside>
       <div className="lg:pl-[16.5rem] lg:pr-5 h-full flex flex-col">
-        <div className="mt-3 mx-3 lg:mx-0 h-14 rounded-3xl bg-card shadow-[0_4px_20px_rgba(0,50,73,0.07)] dark:border flex items-center px-4 gap-3">
+        <div className="mt-3 mx-3 lg:mx-0 h-14 rounded-3xl bg-card shadow-[0_4px_20px_rgba(0,50,73,0.07)] flex items-center px-4 gap-3">
           <Skeleton className="h-5 w-5 rounded-md lg:hidden" />
           <Skeleton className="h-4 w-36 rounded-full" />
           <div className="flex-1" />

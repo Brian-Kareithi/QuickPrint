@@ -12,10 +12,8 @@ import { chatSocket, CUSTOMER_QUICK_MESSAGES, getChatToken, mergeMessages, setCh
 
 interface Props {
   shop: { id: string; name: string };
-  /** When set, the order is linked to the chat (started or existing). */
   orderNumber?: string;
   customerName?: string;
-  /** Open the panel immediately (e.g. from a "Message the shop" button). */
   defaultOpen?: boolean;
 }
 
@@ -51,7 +49,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     }
   }, [forget]);
 
-  // Initial load + live updates while we have a chat.
   useEffect(() => {
     if (!token) return;
     api.chat.mine(token)
@@ -62,11 +59,9 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
       setMessages((prev) => mergeMessages(prev, [m]));
       if (m.sender === 'SHOP' && !openRef.current) {
         setUnseen((n) => n + 1);
-        // Show the reply even though the chat is closed; tap to open it.
         toast({ id: 'shop-reply', icon: '💬', title: `New message from ${shop.name}`, body: m.body, onClick: () => { setOpen(true); setUnseen(0); } });
       }
     });
-    // Fallback in case the socket can't connect (proxies, flaky networks).
     const poll = setInterval(() => {
       const list = messagesRef.current;
       load(token, list[list.length - 1]?.createdAt);
@@ -74,7 +69,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     return () => { socket.disconnect(); clearInterval(poll); };
   }, [token, load, forget, shop.name]);
 
-  // Link a freshly placed order to an existing chat.
   useEffect(() => {
     if (!token || !orderNumber || !conversation || conversation.orderNumber === orderNumber) return;
     api.chat.linkOrder(token, orderNumber).then(setConversation).then(() => load(token)).catch(() => {});
@@ -105,14 +99,12 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     }
   };
 
-  // A link like /shop/<slug>?chat=open opens the chat straight away.
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('chat') !== 'open') return;
     const t = setTimeout(() => setOpen(true), 0);
     return () => clearTimeout(t);
   }, []);
 
-  // Close the popup with Escape.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
@@ -136,7 +128,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
       )}
 
       {open && (
-        // Popup: frosted backdrop; centred glass card on larger screens, near full-height sheet on phones.
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-6">
           <button aria-label="Close chat" onClick={() => setOpen(false)} className="glass-backdrop absolute inset-0 anim-pop cursor-default" />
           <div
@@ -145,7 +136,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
             aria-label={`Chat with ${shop.name}`}
             className="glass glass-strong anim-panel relative w-full sm:max-w-md h-[calc(100dvh-1rem)] sm:h-[min(40rem,calc(100dvh-3rem))] rounded-[2rem] overflow-hidden"
           >
-            {/* Messages scroll underneath the floating header and composer. */}
             <div className="absolute inset-0 overflow-y-auto overscroll-contain px-3 pt-24 pb-36">
               {token && !conversation ? (
                 <ChatBubblesSkeleton />
@@ -167,7 +157,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
               )}
             </div>
 
-            {/* Floating header */}
             <header className="glass-ink absolute top-3 inset-x-3 z-10 rounded-3xl flex items-center gap-3 pl-3 pr-2 py-2.5">
               <span className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center text-xl flex-shrink-0">{conversation?.emoji || '💬'}</span>
               <div className="min-w-0 flex-1">
@@ -179,7 +168,6 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
               <button onClick={() => setOpen(false)} className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center" aria-label="Close chat"><X className="h-4 w-4" /></button>
             </header>
 
-            {/* Floating composer */}
             <div className="absolute bottom-3 inset-x-3 z-10 space-y-1.5">
               {error && <p className="anim-pop text-xs text-red-700 bg-red-50 border border-red-100 rounded-2xl p-2">{error}</p>}
               <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="glass rounded-[1.75rem] flex items-end gap-2 p-1.5 pl-4">

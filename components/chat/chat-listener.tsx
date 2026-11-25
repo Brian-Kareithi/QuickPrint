@@ -6,12 +6,6 @@ import { api } from '@/lib/api';
 import { chatPresence, chatSocket, type ChatMessage } from '@/lib/chat';
 import { toast } from '@/components/toaster';
 
-/**
- * Dashboard-wide chat listener for owners and cashiers. Keeps one live connection for the shop and:
- *  - shows a toast with the customer's message (unless that conversation is already open),
- *  - shows a desktop notification when the tab is in the background (if the browser allows it),
- *  - tells the layout to refresh the unread badge immediately.
- */
 export function ChatListener({ shopId, onActivity }: { shopId: string; onActivity: () => void }) {
   const router = useRouter();
   const pathname = usePathname();

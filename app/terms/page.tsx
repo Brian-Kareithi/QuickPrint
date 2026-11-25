@@ -43,7 +43,7 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
         <li><strong>Chat messages</strong> between you and a shop, the nickname we give you (for example &quot;Cute Pineapple&quot;), and any order number you link to the chat.</li>
         <li><strong>Account details</strong> if you register: name, email, phone and a securely hashed password (we never store your password itself).</li>
         <li><strong>Technical information</strong>: your IP address, used briefly in memory to prevent abuse (for example limiting repeated shop-code attempts), and basic server logs.</li>
-        <li><strong>On your device</strong>: the website and app save a few items locally, such as your chat key, the last shop you used and your theme preference. You can clear these by clearing the app&apos;s storage or your browser data.</li>
+        <li><strong>On your device</strong>: the website and app save a few items locally, such as your chat key and the last shop you used. You can clear these by clearing the app&apos;s storage or your browser data.</li>
         <li><strong>Camera (Android app)</strong>: the QR scanner uses Google&apos;s code scanner to read a shop&apos;s QR code. We do not take, store or upload photos.</li>
       </ul>
     ),

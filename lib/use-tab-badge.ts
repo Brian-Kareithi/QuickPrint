@@ -18,7 +18,6 @@ function setTitle(count: number) {
   if (document.title !== next) document.title = next;
 }
 
-/** Draws the unread count as a red badge over the site icon (like Gmail/WhatsApp Web). */
 function setIcon(count: number) {
   const links = iconLinks();
   if (links.length === 0) return;
@@ -58,10 +57,6 @@ function setIcon(count: number) {
   img.src = originalIcon;
 }
 
-/**
- * Shows an unread count in the browser tab: "(3) Orders · QuickPrint" plus a red badge on the
- * tab icon. Re-applies itself when Next.js changes the page title on navigation.
- */
 export function useTabBadge(count: number) {
   useEffect(() => {
     setTitle(count);
@@ -72,6 +67,5 @@ export function useTabBadge(count: number) {
     return () => observer.disconnect();
   }, [count]);
 
-  // Clear the badge when the component using it goes away.
   useEffect(() => () => { setTitle(0); setIcon(0); }, []);
 }

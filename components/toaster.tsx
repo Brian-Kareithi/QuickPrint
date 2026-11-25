@@ -7,23 +7,19 @@ export interface Toast {
   id?: string;
   title: string;
   body?: string;
-  /** Emoji or short text shown in the round badge (e.g. the customer's fruit). */
   icon?: string;
   onClick?: () => void;
-  /** ms before it hides; default 6000. */
   duration?: number;
 }
 
 type Listener = (t: Required<Pick<Toast, 'id'>> & Toast) => void;
 const listeners = new Set<Listener>();
 
-/** Show a toast from anywhere (no React context needed). Same id replaces the previous toast. */
 export function toast(t: Toast) {
   const withId = { ...t, id: t.id || Math.random().toString(36).slice(2) };
   listeners.forEach((l) => l(withId));
 }
 
-/** Mount once (root layout). Renders a stack of glass toasts at the top right (top centre on phones). */
 export function Toaster() {
   const [items, setItems] = useState<(Toast & { id: string })[]>([]);
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
@@ -46,7 +42,6 @@ export function Toaster() {
     listeners.add(onToast);
     const map = timers.current;
     return () => { listeners.delete(onToast); map.forEach(clearTimeout); };
-    // arm/dismiss only touch refs and state setters, so subscribing once is correct.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
