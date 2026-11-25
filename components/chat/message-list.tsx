@@ -17,14 +17,14 @@ export function MessageList({ messages, mine, className = '' }: { messages: Chat
       {messages.map((m) => {
         if (m.sender === 'SYSTEM') {
           return (
-            <p key={m.id} className="self-center max-w-[90%] text-center text-[11px] text-foreground/55 bg-muted rounded-full px-3 py-1">
+            <p key={m.id} className="anim-pop self-center max-w-[90%] text-center text-[11px] text-foreground/55 bg-muted rounded-full px-3 py-1">
               {m.body}
             </p>
           );
         }
         const isMine = m.sender === mine;
         return (
-          <div key={m.id} className={`flex flex-col max-w-[80%] ${isMine ? 'self-end items-end' : 'self-start items-start'}`}>
+          <div key={m.id} className={`anim-pop flex flex-col max-w-[85%] sm:max-w-[80%] ${isMine ? 'self-end items-end' : 'self-start items-start'}`}>
             <div
               className={`whitespace-pre-wrap break-words text-sm leading-snug px-3 py-2 rounded-2xl ${
                 isMine ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card border rounded-bl-md'

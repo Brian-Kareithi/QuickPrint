@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
 import { MessageList } from '@/components/chat/message-list';
+import { ChatBubblesSkeleton } from '@/components/skeleton';
+import { useTabBadge } from '@/lib/use-tab-badge';
 import { chatSocket, CUSTOMER_QUICK_MESSAGES, getChatToken, mergeMessages, setChatToken, type ChatMessage } from '@/lib/chat';
 
 interface Props {
@@ -25,6 +27,7 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [unseen, setUnseen] = useState(0);
+  useTabBadge(unseen);
   const openRef = useRef(open);
   const messagesRef = useRef<ChatMessage[]>([]);
   useEffect(() => { openRef.current = open; }, [open]);
@@ -107,13 +110,13 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
         >
           <MessageCircle className="h-6 w-6" />
           {unseen > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-semibold flex items-center justify-center">{unseen}</span>
+            <span key={unseen} className="anim-badge absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-semibold flex items-center justify-center">{unseen}</span>
           )}
         </button>
       )}
 
       {open && (
-        <div className="fixed z-50 inset-x-2 bottom-2 top-16 sm:inset-auto sm:right-4 sm:bottom-14 sm:w-96 sm:h-[34rem] rounded-3xl bg-background border shadow-2xl flex flex-col overflow-hidden page-enter" role="dialog" aria-label={`Chat with ${shop.name}`}>
+        <div className="fixed z-50 inset-x-2 bottom-2 top-16 sm:inset-auto sm:right-4 sm:bottom-14 sm:w-96 sm:h-[34rem] sm:max-h-[calc(100dvh-5rem)] rounded-3xl bg-background border shadow-2xl flex flex-col overflow-hidden anim-panel" role="dialog" aria-label={`Chat with ${shop.name}`}>
           <header className="flex items-center gap-3 px-4 py-3 bg-panel text-white">
             <span className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center text-lg">{conversation?.emoji || '💬'}</span>
             <div className="min-w-0 flex-1">
@@ -126,15 +129,17 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
           </header>
 
           <div className="flex-1 min-h-0 overflow-y-auto p-3">
-            {messages.length === 0 ? (
+            {token && !conversation ? (
+              <ChatBubblesSkeleton />
+            ) : messages.length === 0 ? (
               <div className="h-full flex flex-col justify-end gap-3">
                 <p className="text-sm text-foreground/70 text-center px-4">
                   Cancelled your request or sent the wrong file? Message {shop.name} here. You&apos;ll get a fun nickname so they can find you, no account needed.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {CUSTOMER_QUICK_MESSAGES.map((q) => (
-                    <button key={q} onClick={() => send(q)} disabled={sending}
-                      className="text-xs rounded-full border bg-card px-3 py-1.5 hover:border-primary hover:text-primary">{q}</button>
+                    <button key={q} onClick={() => send(q)} disabled={sending} style={{ '--i': CUSTOMER_QUICK_MESSAGES.indexOf(q) } as React.CSSProperties}
+                      className="anim-fade-up text-xs rounded-full border bg-card px-3 py-1.5 hover:border-primary hover:text-primary">{q}</button>
                   ))}
                 </div>
               </div>

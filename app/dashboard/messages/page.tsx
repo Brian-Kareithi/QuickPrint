@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Loader2, MessageCircle, RotateCcw, Send } from 'lucide-react';
 import { api } from '@/lib/api';
-import { ListSkeleton } from '@/components/skeleton';
+import { MessagesSkeleton, ChatBubblesSkeleton } from '@/components/skeleton';
 import { ErrorState } from '@/components/error-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ function Avatar({ c, size = 'h-10 w-10' }: { c: Conversation; size?: string }) {
 
 // useSearchParams needs a Suspense boundary for static rendering.
 export default function MessagesPage() {
-  return <Suspense fallback={<ListSkeleton />}><MessagesInbox /></Suspense>;
+  return <Suspense fallback={<MessagesSkeleton />}><MessagesInbox /></Suspense>;
 }
 
 function MessagesInbox() {
@@ -93,7 +93,9 @@ function MessagesInbox() {
   // Open a specific chat from a link, e.g. /dashboard/messages?c=<conversationId>.
   const linkedId = useSearchParams().get('c');
   useEffect(() => {
-    if (shopId && linkedId) openThread(linkedId);
+    if (!shopId || !linkedId) return;
+    const t = setTimeout(() => openThread(linkedId), 0);
+    return () => clearTimeout(t);
   }, [shopId, linkedId, openThread]);
 
   // Live updates for the whole shop inbox.
@@ -147,7 +149,7 @@ function MessagesInbox() {
     }
   };
 
-  if (loading) return <ListSkeleton />;
+  if (loading) return <MessagesSkeleton />;
   if (error && conversations.length === 0 && !shopId) return <ErrorState title="Couldn't load messages" message={error} />;
 
   return (
@@ -157,7 +159,7 @@ function MessagesInbox() {
         <div className="p-4 pb-3 border-b">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">Customer chats</h2>
-            {unreadTotal > 0 && <span className="text-[11px] font-semibold rounded-full bg-primary text-primary-foreground px-2 py-0.5">{unreadTotal} new</span>}
+            {unreadTotal > 0 && <span key={unreadTotal} className="anim-badge text-[11px] font-semibold rounded-full bg-primary text-primary-foreground px-2 py-0.5">{unreadTotal} new</span>}
           </div>
           <p className="text-xs text-foreground/55 mt-0.5">Customers get a fun nickname so you can tell them apart.</p>
           <div className="flex gap-1.5 mt-3">
@@ -174,8 +176,8 @@ function MessagesInbox() {
               No {filter === 'CLOSED' ? 'resolved' : filter === 'OPEN' ? 'open' : ''} chats yet.
             </li>
           )}
-          {visible.map((c) => (
-            <li key={c.id}>
+          {visible.map((c, i) => (
+            <li key={c.id} className="anim-fade-up" style={{ '--i': i } as React.CSSProperties}>
               <button onClick={() => openThread(c.id)}
                 className={`w-full text-left flex items-center gap-3 px-4 py-3 border-b border-border/60 hover:bg-muted/60 ${c.id === activeId ? 'bg-muted' : ''}`}>
                 <Avatar c={c} />
@@ -186,7 +188,7 @@ function MessagesInbox() {
                   </span>
                   <span className="flex items-center gap-2">
                     <span className={`text-xs truncate ${c.unreadByShop > 0 ? 'text-foreground' : 'text-foreground/55'}`}>{c.lastMessagePreview || 'No messages yet'}</span>
-                    {c.unreadByShop > 0 && <span className="ml-auto min-w-5 h-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center flex-shrink-0">{c.unreadByShop}</span>}
+                    {c.unreadByShop > 0 && <span key={c.unreadByShop} className="anim-badge ml-auto min-w-5 h-5 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center flex-shrink-0">{c.unreadByShop}</span>}
                   </span>
                   {c.orderNumber && <span className="block text-[10px] text-primary mt-0.5">{c.orderNumber}</span>}
                 </span>
@@ -229,7 +231,7 @@ function MessagesInbox() {
             )}
 
             <div className="flex-1 min-h-0 overflow-y-auto p-4">
-              {threadLoading ? <div className="h-full flex items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-foreground/40" /></div>
+              {threadLoading ? <ChatBubblesSkeleton />
                 : <MessageList messages={messages} mine="SHOP" />}
             </div>
 

@@ -161,8 +161,8 @@ export default function TermsPage() {
         </nav>
 
         <div className="mt-6 space-y-4">
-          {sections.map((s) => (
-            <section key={s.id} id={s.id} className="scroll-mt-6 bg-card rounded-3xl border p-5 sm:p-6">
+          {sections.map((s, i) => (
+            <section key={s.id} id={s.id} style={{ '--i': i } as React.CSSProperties} className="anim-fade-up scroll-mt-6 bg-card rounded-3xl border p-5 sm:p-6">
               <h2 className="text-lg font-semibold mb-3">{s.title}</h2>
               <div className="text-sm leading-relaxed text-foreground/80 space-y-3">{s.body}</div>
             </section>

@@ -341,7 +341,7 @@ export default function CustomerPortal() {
         </ol>
 
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col">
-        <div className="my-auto w-full space-y-3 py-1">
+        <div key={page} className="page-enter my-auto w-full space-y-3 py-1">
         {error && (
           <div className="bg-red-50 border border-red-100 text-red-700 text-sm p-3 rounded-2xl">{error}</div>
         )}
@@ -364,8 +364,8 @@ export default function CustomerPortal() {
 
             {files.length > 0 && (
               <div className="space-y-2">
-                {files.map((file) => (
-                  <div key={file.id} className="flex items-center gap-3 bg-card rounded-2xl border p-3">
+                {files.map((file, i) => (
+                  <div key={file.id} style={{ '--i': i } as React.CSSProperties} className="anim-fade-up flex items-center gap-3 bg-card rounded-2xl border p-3">
                     <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <FileText className="h-4 w-4 text-primary" />
                     </div>

@@ -22,8 +22,8 @@ export default function AdminSystem() {
   if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
   if (!health) return (
     <div className="grid lg:grid-cols-2 gap-6">
-      <Skeleton className="h-64 rounded-2xl" />
-      <Skeleton className="h-64 rounded-2xl" />
+      <Skeleton className="h-64 rounded-3xl" />
+      <Skeleton className="h-64 rounded-3xl" />
     </div>
   );
 

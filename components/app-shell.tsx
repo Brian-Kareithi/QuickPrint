@@ -7,6 +7,7 @@ import { Menu, X, LogOut, Bell } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { api } from '@/lib/api';
+import { useTabBadge } from '@/lib/use-tab-badge';
 
 export interface NavItem {
   href: string;
@@ -29,17 +30,27 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [unreadOther, setUnreadOther] = useState(0);
 
   useEffect(() => {
     if (!showNotifications) return;
     let alive = true;
     const load = () => api.notifications.list()
-      .then((n) => { if (alive) setUnread(n.filter((x: any) => !x.read).length); })
+      .then((n) => {
+        if (!alive) return;
+        const fresh = n.filter((x: any) => !x.read);
+        setUnread(fresh.length);
+        // Chat messages are counted from the Messages badge instead, so don't count them twice.
+        setUnreadOther(fresh.filter((x: any) => x.type !== 'CHAT_MESSAGE').length);
+      })
       .catch(() => {});
     load();
     const t = setInterval(load, 30000);
     return () => { alive = false; clearInterval(t); };
   }, [showNotifications, pathname]);
+
+  // "(3) QuickPrint" + a red badge on the tab icon for unread notifications and chat messages.
+  useTabBadge((showNotifications ? unreadOther : 0) + nav.reduce((n, item) => n + (item.badge || 0), 0));
 
   const isActive = (href: string) =>
     href === '/dashboard' || href === '/admin' || href === '/my-orders' ? pathname === href : pathname.startsWith(href);
@@ -75,7 +86,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
               <item.icon className="h-4 w-4" />
               {item.label}
               {!!item.badge && (
-                <span className={`ml-auto min-w-5 h-5 px-1.5 rounded-full text-[10px] font-semibold flex items-center justify-center ${isActive(item.href) ? 'bg-white text-[#003249]' : 'bg-primary text-primary-foreground'}`}>
+                <span key={item.badge} className={`anim-badge ml-auto min-w-5 h-5 px-1.5 rounded-full text-[10px] font-semibold flex items-center justify-center ${isActive(item.href) ? 'bg-white text-[#003249]' : 'bg-primary text-primary-foreground'}`}>
                   {item.badge > 99 ? '99+' : item.badge}
                 </span>
               )}
@@ -112,7 +123,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
             <Link href="/notifications" title="Notifications" className="relative p-2 rounded-xl hover:bg-muted transition-colors">
               <Bell className="h-4 w-4" />
               {unread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
+                <span key={unread} className="anim-badge absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
                   {unread > 9 ? '9+' : unread}
                 </span>
               )}

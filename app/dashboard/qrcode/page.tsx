@@ -33,10 +33,10 @@ export default function QRCodePage() {
     <div className="grid lg:grid-cols-5 gap-5 max-w-4xl">
       <div className="lg:col-span-3 space-y-4">
         <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-32 rounded-2xl" />
-        <Skeleton className="h-28 rounded-2xl" />
+        <Skeleton className="h-32 rounded-3xl" />
+        <Skeleton className="h-28 rounded-3xl" />
       </div>
-      <Skeleton className="lg:col-span-2 h-80 rounded-2xl" />
+      <Skeleton className="lg:col-span-2 h-80 rounded-3xl" />
     </div>
   );
   if (error && !shop) return <ErrorState message={error} onRetry={() => window.location.reload()} />;

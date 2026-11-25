@@ -168,3 +168,31 @@ button:not(:disabled):active { transform: scale(0.98); }
 .dark [class*="shadow"] { --tw-shadow: 0 0 #0000 !important; }
 .dark .backdrop-blur-xl, .dark .backdrop-blur-md, .dark .backdrop-blur-sm { backdrop-filter: none; }
 .dark ::selection { background-color: #13506a; color: #e7eef1; }
+
+/* ---------- Motion: short, subtle, transform/opacity only (disabled by prefers-reduced-motion above) ---------- */
+@keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(4px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes panel-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes badge-bump { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* Lists: give each item style={{ '--i': index }} for a gentle stagger. */
+.anim-fade-up { animation: fade-up 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(min(var(--i, 0), 10) * 35ms); }
+.anim-pop { animation: pop-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-panel { animation: panel-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: bottom right; }
+.anim-badge { animation: badge-bump 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.lift { transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+@media (hover: hover) { .lift:hover { transform: translateY(-2px); } }
+
+/* ---------- Skeletons: same surfaces/radii as real cards; shimmer in light, flat pulse in dark ---------- */
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.skeleton { position: relative; overflow: hidden; background-color: var(--muted); }
+.skeleton::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.panel .skeleton, .skeleton-on-panel { background-color: rgb(255 255 255 / 0.10); }
+.panel .skeleton::after, .skeleton-on-panel::after { background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.10), transparent); }
+.dark .skeleton::after { display: none; }
+.dark .skeleton { animation: pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes pulse { 50% { opacity: 0.55; } }
