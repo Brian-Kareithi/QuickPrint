@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ShoppingBag, ListTodo, BarChart3, Settings, QrCode, Palette, DollarSign,
-  Users, Wallet, Building2, Shield, UserCog, ScrollText, Receipt, UserCircle, Upload,
+  Users, Wallet, Building2, Shield, UserCog, ScrollText, Receipt, UserCircle, Upload, MessageCircle,
 } from 'lucide-react';
 import type { NavItem } from '@/components/app-shell';
 
@@ -26,6 +26,7 @@ export function navFor(role: string): { nav: NavItem[]; roleLabel: string } {
         nav: [
           { href: '/dashboard/queue', icon: ListTodo, label: 'Print Queue' },
           { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
+          { href: '/dashboard/messages', icon: MessageCircle, label: 'Messages' },
           { href: '/dashboard/qrcode', icon: QrCode, label: 'QR Code' },
           profile,
         ],
@@ -45,6 +46,7 @@ export function navFor(role: string): { nav: NavItem[]; roleLabel: string } {
         nav: [
           { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
           { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
+          { href: '/dashboard/messages', icon: MessageCircle, label: 'Messages' },
           { href: '/dashboard/queue', icon: ListTodo, label: 'Print Queue' },
           { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
           { href: '/dashboard/qrcode', icon: QrCode, label: 'QR Code' },

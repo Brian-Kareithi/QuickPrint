@@ -22,6 +22,8 @@ export function SiteFooter() {
         >
           Kareithi
         </a>
+        <span aria-hidden="true"> · </span>
+        <a href="/terms" className="hover:underline underline-offset-2">Terms &amp; Privacy</a>
       </p>
     </footer>
   );

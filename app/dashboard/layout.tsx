@@ -15,6 +15,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isAuthenticated, loading, logout, authError, retryAuth } = useAuth();
   const router = useRouter();
   const [shops, setShops] = useState<Shop[]>([]);
+  const [unreadChats, setUnreadChats] = useState(0);
 
   useEffect(() => {
     if (loading || authError) return;
@@ -28,6 +29,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [isAuthenticated, user?.role]);
 
+  const shopId = shops[0]?.id;
+  useEffect(() => {
+    if (!shopId) return;
+    let alive = true;
+    const load = () => api.chat.unread(shopId).then((u) => { if (alive) setUnreadChats(u.messages); }).catch(() => {});
+    load();
+    const t = setInterval(load, 20000);
+    return () => { alive = false; clearInterval(t); };
+  }, [shopId]);
+
   if (loading) return <ShellSkeleton />;
   if (authError && !user) {
     return (
@@ -39,7 +50,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!isAuthenticated || !user || user.role === 'ADMIN' || user.role === 'CUSTOMER') return <ShellSkeleton />;
 
   const isCashier = user.role === 'STAFF';
-  const { nav, roleLabel } = navFor(user.role);
+  const { nav: baseNav, roleLabel } = navFor(user.role);
+  const nav = baseNav.map((item) => (item.href === '/dashboard/messages' ? { ...item, badge: unreadChats } : item));
 
   return (
     <AppShell

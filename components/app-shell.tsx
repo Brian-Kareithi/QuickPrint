@@ -12,6 +12,7 @@ export interface NavItem {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  badge?: number;
 }
 
 interface Props {
@@ -73,6 +74,11 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
             >
               <item.icon className="h-4 w-4" />
               {item.label}
+              {!!item.badge && (
+                <span className={`ml-auto min-w-5 h-5 px-1.5 rounded-full text-[10px] font-semibold flex items-center justify-center ${isActive(item.href) ? 'bg-white text-[#003249]' : 'bg-primary text-primary-foreground'}`}>
+                  {item.badge > 99 ? '99+' : item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

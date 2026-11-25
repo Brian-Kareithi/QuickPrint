@@ -12,6 +12,8 @@ import { applyTheme } from '@/lib/theme';
 import { useAuth } from '@/lib/auth-context';
 import { acceptFor } from '@/lib/file-types';
 import { LogoMark } from '@/components/logo';
+import { CustomerChat } from '@/components/chat/customer-chat';
+import Link from 'next/link';
 import { paymentOptions, paymentInstructions } from '@/lib/payments';
 import { formatCurrency, formatFileSize, getTimeRemaining } from '@/lib/utils';
 import { Upload, FileText, X, Printer, Check, Loader2, Phone, Mail, MapPin, RefreshCw, Moon } from 'lucide-react';
@@ -230,7 +232,9 @@ export default function CustomerPortal() {
             <p className="text-foreground/60 pt-1">Show your order number to the cashier when you pay.</p>
           </div>
           <p className="text-[11px] text-foreground/50">{user ? 'This order is saved to your account.' : 'Sign in or create a customer account with the same email to see this order in your account.'} Your files are permanently deleted one hour after your order is ready.</p>
+          <p className="text-[11px] text-foreground/60">Sent the wrong file or want to cancel? Tap the chat button to message {shop.name}.</p>
         </div>
+        <CustomerChat shop={shop} orderNumber={orderResult.orderNumber} customerName={orderForm.customerName || undefined} />
       </div>
     );
   }
@@ -299,6 +303,7 @@ export default function CustomerPortal() {
             </button>
           </div>
         </div>
+        <CustomerChat shop={shop} />
       </div>
     );
   }
@@ -352,7 +357,7 @@ export default function CustomerPortal() {
               {files.length === 0 && (
                 <>
                   <p className="text-xs text-foreground/55 mt-1">PDF, DOC, DOCX, PPT, XLS, JPG, PNG, ZIP</p>
-                  <p className="text-[11px] text-foreground/45 mt-2 max-w-xs mx-auto">Your files go straight to {shop.name} and are permanently deleted one hour after your order is ready.</p>
+                  <p className="text-[11px] text-foreground/45 mt-2 max-w-xs mx-auto">Your files go straight to {shop.name} and are permanently deleted one hour after your order is ready. By uploading you agree to our <Link href="/terms" onClick={(e) => e.stopPropagation()} className="underline">Terms &amp; Privacy Policy</Link>.</p>
                 </>
               )}
             </div>
@@ -526,6 +531,7 @@ export default function CustomerPortal() {
         </div>
         </div>
       </div>
+      <CustomerChat shop={shop} customerName={orderForm.customerName || undefined} />
     </div>
   );
 }

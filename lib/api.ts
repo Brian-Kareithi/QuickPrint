@@ -60,7 +60,31 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
+/** Origin of the API server (no /api), used for Socket.IO connections. */
+export const API_ORIGIN = API_BASE.replace(/\/api$/, '');
+
+const chatHeaders = (token: string) => ({ 'X-Chat-Token': token });
+
 export const api = {
+  chat: {
+    start: (shopId: string, data: { orderNumber?: string; customerName?: string } = {}) =>
+      request<{ token: string; conversation: any }>(`/chat/shops/${shopId}/start`, { method: 'POST', body: JSON.stringify(data) }),
+    mine: (token: string, after?: string) =>
+      request<{ conversation: any; messages: any[] }>(`/chat/me${after ? `?after=${encodeURIComponent(after)}` : ''}`, { headers: chatHeaders(token) }),
+    send: (token: string, body: string) =>
+      request<any>('/chat/me/messages', { method: 'POST', body: JSON.stringify({ body }), headers: chatHeaders(token) }),
+    linkOrder: (token: string, orderNumber: string) =>
+      request<any>('/chat/me/order', { method: 'PATCH', body: JSON.stringify({ orderNumber }), headers: chatHeaders(token) }),
+    list: (shopId: string, status?: string) =>
+      request<any[]>(`/chat/shop/${shopId}/conversations${status ? `?status=${status}` : ''}`),
+    unread: (shopId: string) => request<{ messages: number; conversations: number }>(`/chat/shop/${shopId}/unread`),
+    get: (id: string, after?: string) =>
+      request<{ conversation: any; messages: any[]; order: any }>(`/chat/conversations/${id}${after ? `?after=${encodeURIComponent(after)}` : ''}`),
+    reply: (id: string, body: string) =>
+      request<any>(`/chat/conversations/${id}/messages`, { method: 'POST', body: JSON.stringify({ body }) }),
+    setStatus: (id: string, status: 'OPEN' | 'CLOSED') =>
+      request<any>(`/chat/conversations/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  },
   auth: {
     login: (email: string, password: string) =>
       request<{ user: any; token: string }>('/auth/login', {
