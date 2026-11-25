@@ -23,6 +23,9 @@ import type { Shop, PriceBreakdown } from '@/types';
 const inputClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 const selectClass = "block w-full h-11 sm:h-10 rounded-xl border border-input bg-card px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-shadow";
 
+/** The shop's background colour, slightly translucent so the ambient glass backdrop shows through. */
+const tint = (color: string) => `color-mix(in srgb, ${color} 78%, transparent)`;
+
 async function detectPdfPages(file: File): Promise<number> {
   if (!file.name.toLowerCase().endsWith('.pdf')) return 1;
   try {
@@ -209,7 +212,7 @@ export default function CustomerPortal() {
 
   if (page === 'done' && orderResult) {
     return (
-      <div className="light-brand fit-screen overflow-hidden flex items-center justify-center p-3" style={{ backgroundColor: shop.branding?.backgroundColor || '#fff' }}>
+      <div className="light-brand fit-screen overflow-hidden flex items-center justify-center p-3" style={{ backgroundColor: tint(shop.branding?.backgroundColor || '#ffffff') }}>
         <div className="page-enter max-w-sm w-full max-h-full overflow-y-auto text-center space-y-[clamp(0.5rem,1.8vh,1rem)] bg-card rounded-[2rem] p-[clamp(1rem,3vh,2rem)] shadow-[0_20px_50px_-12px_rgba(0,50,73,0.25)] border">
           <div className="h-[clamp(2.5rem,7vh,3.5rem)] aspect-square rounded-full bg-green-50 border border-green-100 flex items-center justify-center mx-auto">
             <Check className="h-1/2 w-1/2 text-green-600" />
@@ -253,7 +256,7 @@ export default function CustomerPortal() {
     ].filter(Boolean) as { icon: typeof Phone; label: string; href?: string }[];
 
     return (
-      <div className="fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: pageBg }}>
+      <div className="fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: tint(pageBg) }}>
         <div className="page-enter relative flex-1 min-h-0 overflow-hidden rounded-3xl bg-panel text-white flex items-center justify-center p-5">
           <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full blur-3xl opacity-40" style={{ backgroundColor: brand }} />
           <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[#80ced7]/20 blur-3xl" />
@@ -312,7 +315,7 @@ export default function CustomerPortal() {
   const stepIndex = STEPS.findIndex(([k]) => k === page);
 
   return (
-    <div className="light-brand fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: pageBg }}>
+    <div className="light-brand fit-screen overflow-hidden flex flex-col p-3" style={{ backgroundColor: tint(pageBg) }}>
       <style>{`.qp-shop button { border-radius: ${shop.branding?.buttonStyle === 'pill' ? '9999px' : shop.branding?.buttonStyle === 'square' ? '0' : '0.5rem'}; }`}</style>
       <div className="qp-shop w-full max-w-lg mx-auto flex-1 min-h-0 flex flex-col gap-3">
         <header className="page-enter relative flex-shrink-0 overflow-hidden rounded-3xl bg-panel text-white px-4 py-3 flex items-center gap-3">

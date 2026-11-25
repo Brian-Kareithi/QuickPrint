@@ -105,6 +105,13 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     }
   };
 
+  // A link like /shop/<slug>?chat=open opens the chat straight away.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('chat') !== 'open') return;
+    const t = setTimeout(() => setOpen(true), 0);
+    return () => clearTimeout(t);
+  }, []);
+
   // Close the popup with Escape.
   useEffect(() => {
     if (!open) return;
