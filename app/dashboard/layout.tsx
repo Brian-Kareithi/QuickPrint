@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { navFor } from '@/lib/nav';
 import { homeFor } from '@/lib/roles';
@@ -10,6 +10,7 @@ import { AppShell } from '@/components/app-shell';
 import { ShellSkeleton } from '@/components/skeleton';
 import { ErrorState } from '@/components/error-state';
 import type { Shop } from '@/types';
+import { ChatListener } from '@/components/chat/chat-listener';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, loading, logout, authError, retryAuth } = useAuth();
@@ -36,8 +37,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const load = () => api.chat.unread(shopId).then((u) => { if (alive) setUnreadChats(u.messages); }).catch(() => {});
     load();
     const t = setInterval(load, 20000);
-    return () => { alive = false; clearInterval(t); };
+    window.addEventListener('qp:chat-activity', load);
+    return () => { alive = false; clearInterval(t); window.removeEventListener('qp:chat-activity', load); };
   }, [shopId]);
+  // Live: the chat listener pings this whenever a message or read-state changes.
+  const refreshUnread = useCallback(() => { window.dispatchEvent(new Event('qp:chat-activity')); }, []);
 
   if (loading) return <ShellSkeleton />;
   if (authError && !user) {
@@ -62,6 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       onLogout={logout}
       showNotifications={!isCashier}
     >
+      {shopId && <ChatListener shopId={shopId} onActivity={refreshUnread} />}
       {children}
     </AppShell>
   );

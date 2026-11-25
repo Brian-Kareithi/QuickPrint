@@ -58,3 +58,6 @@ export const SHOP_QUICK_REPLIES = [
   'Your order is ready for pickup.',
   'Give us about 10 minutes.',
 ];
+
+/** Which conversation the shop has open right now (so the global listener doesn't toast it). */
+export const chatPresence: { conversationId: string | null } = { conversationId: null };

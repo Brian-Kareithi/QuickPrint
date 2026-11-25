@@ -196,3 +196,29 @@ button:not(:disabled):active { transform: scale(0.98); }
 .dark .skeleton::after { display: none; }
 .dark .skeleton { animation: pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 @keyframes pulse { 50% { opacity: 0.55; } }
+
+/* ---------- Liquid glass: translucent, frosted surfaces with a soft edge highlight ---------- */
+.glass {
+  background-color: color-mix(in srgb, var(--card) 72%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgb(255 255 255 / 0.55);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 10px 30px -12px rgb(0 50 73 / 0.25);
+}
+.glass-strong { background-color: color-mix(in srgb, var(--card) 86%, transparent); }
+.glass-ink {
+  background-color: color-mix(in srgb, var(--panel) 86%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 10px 30px -12px rgb(0 50 73 / 0.35);
+  color: #fff;
+}
+.glass-backdrop { background-color: rgb(0 30 44 / 0.28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.dark .glass { background-color: color-mix(in srgb, var(--card) 78%, transparent); border-color: rgb(255 255 255 / 0.07); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04); }
+.dark .glass-strong { background-color: color-mix(in srgb, var(--card) 90%, transparent); }
+.dark .glass-ink { border-color: rgb(255 255 255 / 0.08); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05); }
+.dark .glass-backdrop { background-color: rgb(0 0 0 / 0.5); }
+/* Keep the frost in dark mode (the flat rule above only removes decorative blurs/glows). */
+.dark .glass, .dark .glass-ink { -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+@supports not (backdrop-filter: blur(1px)) { .glass { background-color: var(--card); } .glass-ink { background-color: var(--panel); } }

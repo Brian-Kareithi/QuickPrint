@@ -12,7 +12,7 @@ export function SiteFooter() {
     <footer
       className={`pointer-events-none fixed bottom-2.5 inset-x-0 z-40 flex justify-center px-3 ${inShell ? 'lg:pl-[16.5rem] lg:pr-5' : ''}`}
     >
-      <p className="pointer-events-auto rounded-full border bg-card/85 backdrop-blur-md px-3 py-1 text-[11px] text-foreground/60 shadow-md shadow-black/10">
+      <p className="pointer-events-auto rounded-full glass px-3 py-1 text-[11px] text-foreground/60">
         Made proudly by{' '}
         <a
           href="https://kareithi.vercel.app"

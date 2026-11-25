@@ -331,7 +331,7 @@ export default function CustomerPortal() {
         <ol className="flex-shrink-0 flex items-center justify-center gap-2 text-xs font-medium" aria-label="Progress">
           {STEPS.map(([key, label], i) => (
             <li key={key} className="flex items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${i === stepIndex ? 'bg-ink text-white' : i < stepIndex ? 'bg-primary/15 text-primary' : 'bg-card border text-foreground/50'}`}>
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${i === stepIndex ? 'bg-ink text-white' : i < stepIndex ? 'bg-primary/15 text-primary' : 'glass text-foreground/50'}`}>
                 <span className="h-4 w-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">{i < stepIndex ? <Check className="h-3 w-3" /> : i + 1}</span>
                 {label}
               </span>

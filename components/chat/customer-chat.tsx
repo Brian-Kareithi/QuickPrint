@@ -7,6 +7,7 @@ import { api, ApiError } from '@/lib/api';
 import { MessageList } from '@/components/chat/message-list';
 import { ChatBubblesSkeleton } from '@/components/skeleton';
 import { useTabBadge } from '@/lib/use-tab-badge';
+import { toast } from '@/components/toaster';
 import { chatSocket, CUSTOMER_QUICK_MESSAGES, getChatToken, mergeMessages, setChatToken, type ChatMessage } from '@/lib/chat';
 
 interface Props {
@@ -59,7 +60,11 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     const socket = chatSocket({ chatToken: token });
     socket.on('chat:message', (m: ChatMessage) => {
       setMessages((prev) => mergeMessages(prev, [m]));
-      if (m.sender === 'SHOP' && !openRef.current) setUnseen((n) => n + 1);
+      if (m.sender === 'SHOP' && !openRef.current) {
+        setUnseen((n) => n + 1);
+        // Show the reply even though the chat is closed; tap to open it.
+        toast({ id: 'shop-reply', icon: '💬', title: `New message from ${shop.name}`, body: m.body, onClick: () => { setOpen(true); setUnseen(0); } });
+      }
     });
     // Fallback in case the socket can't connect (proxies, flaky networks).
     const poll = setInterval(() => {
@@ -67,7 +72,7 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
       load(token, list[list.length - 1]?.createdAt);
     }, 15000);
     return () => { socket.disconnect(); clearInterval(poll); };
-  }, [token, load, forget]);
+  }, [token, load, forget, shop.name]);
 
   // Link a freshly placed order to an existing chat.
   useEffect(() => {
@@ -100,12 +105,20 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
     }
   };
 
+  // Close the popup with Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
   return (
     <>
       {!open && (
         <button
           onClick={() => { setOpen(true); setUnseen(0); }}
-          className="fixed z-50 bottom-14 right-4 h-14 w-14 rounded-full bg-ink text-white shadow-lg shadow-black/20 flex items-center justify-center hover:scale-105"
+          className="glass-ink anim-pop fixed z-50 bottom-14 right-4 h-14 w-14 rounded-full flex items-center justify-center hover:scale-105"
           aria-label={`Chat with ${shop.name}`}
         >
           <MessageCircle className="h-6 w-6" />
@@ -116,58 +129,73 @@ export function CustomerChat({ shop, orderNumber, customerName, defaultOpen = fa
       )}
 
       {open && (
-        <div className="fixed z-50 inset-x-2 bottom-2 top-16 sm:inset-auto sm:right-4 sm:bottom-14 sm:w-96 sm:h-[34rem] sm:max-h-[calc(100dvh-5rem)] rounded-3xl bg-background border shadow-2xl flex flex-col overflow-hidden anim-panel" role="dialog" aria-label={`Chat with ${shop.name}`}>
-          <header className="flex items-center gap-3 px-4 py-3 bg-panel text-white">
-            <span className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center text-lg">{conversation?.emoji || '💬'}</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate">{shop.name}</p>
-              <p className="text-[11px] text-white/65 truncate">
-                {conversation ? <>You&apos;re chatting as <strong className="text-[#9ad1d4]">{conversation.alias}</strong></> : 'Ask about your order'}
+        // Popup: frosted backdrop; centred glass card on larger screens, near full-height sheet on phones.
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-6">
+          <button aria-label="Close chat" onClick={() => setOpen(false)} className="glass-backdrop absolute inset-0 anim-pop cursor-default" />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Chat with ${shop.name}`}
+            className="glass glass-strong anim-panel relative w-full sm:max-w-md h-[calc(100dvh-1rem)] sm:h-[min(40rem,calc(100dvh-3rem))] rounded-[2rem] overflow-hidden"
+          >
+            {/* Messages scroll underneath the floating header and composer. */}
+            <div className="absolute inset-0 overflow-y-auto overscroll-contain px-3 pt-24 pb-36">
+              {token && !conversation ? (
+                <ChatBubblesSkeleton />
+              ) : messages.length === 0 ? (
+                <div className="min-h-full flex flex-col justify-end gap-3 pb-2">
+                  <p className="text-4xl text-center" aria-hidden="true">🍍🍌🥭</p>
+                  <p className="text-sm text-foreground/70 text-center px-4">
+                    Cancelled your request or sent the wrong file? Message {shop.name} here. You&apos;ll get a fun nickname so they can find you, no account needed.
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {CUSTOMER_QUICK_MESSAGES.map((q, i) => (
+                      <button key={q} onClick={() => send(q)} disabled={sending} style={{ '--i': i } as React.CSSProperties}
+                        className="glass anim-fade-up text-xs rounded-full px-3 py-1.5 hover:text-primary">{q}</button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <MessageList messages={messages} mine="CUSTOMER" />
+              )}
+            </div>
+
+            {/* Floating header */}
+            <header className="glass-ink absolute top-3 inset-x-3 z-10 rounded-3xl flex items-center gap-3 pl-3 pr-2 py-2.5">
+              <span className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center text-xl flex-shrink-0">{conversation?.emoji || '💬'}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate">{shop.name}</p>
+                <p className="text-[11px] text-white/70 truncate">
+                  {conversation ? <>You&apos;re chatting as <strong className="text-[#9ad1d4]">{conversation.alias}</strong></> : 'Ask about your order'}
+                </p>
+              </div>
+              <button onClick={() => setOpen(false)} className="h-9 w-9 rounded-full hover:bg-white/10 flex items-center justify-center" aria-label="Close chat"><X className="h-4 w-4" /></button>
+            </header>
+
+            {/* Floating composer */}
+            <div className="absolute bottom-3 inset-x-3 z-10 space-y-1.5">
+              {error && <p className="anim-pop text-xs text-red-700 bg-red-50 border border-red-100 rounded-2xl p-2">{error}</p>}
+              <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="glass rounded-[1.75rem] flex items-end gap-2 p-1.5 pl-4">
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(draft); } }}
+                  rows={1}
+                  maxLength={2000}
+                  placeholder="Type a message…"
+                  aria-label="Message"
+                  className="flex-1 resize-none max-h-28 bg-transparent border-0 py-2.5 text-sm focus:!shadow-none"
+                />
+                <button type="submit" disabled={sending || !draft.trim()} aria-label="Send"
+                  className="h-11 w-11 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 flex-shrink-0 transition-transform active:scale-95">
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </button>
+              </form>
+              <p className="text-[10px] text-center text-foreground/50">
+                Chats are deleted after 30 days of inactivity. <Link href="/terms#chat" className="underline">Terms &amp; privacy</Link>
               </p>
             </div>
-            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/10" aria-label="Close chat"><X className="h-4 w-4" /></button>
-          </header>
-
-          <div className="flex-1 min-h-0 overflow-y-auto p-3">
-            {token && !conversation ? (
-              <ChatBubblesSkeleton />
-            ) : messages.length === 0 ? (
-              <div className="h-full flex flex-col justify-end gap-3">
-                <p className="text-sm text-foreground/70 text-center px-4">
-                  Cancelled your request or sent the wrong file? Message {shop.name} here. You&apos;ll get a fun nickname so they can find you, no account needed.
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {CUSTOMER_QUICK_MESSAGES.map((q) => (
-                    <button key={q} onClick={() => send(q)} disabled={sending} style={{ '--i': CUSTOMER_QUICK_MESSAGES.indexOf(q) } as React.CSSProperties}
-                      className="anim-fade-up text-xs rounded-full border bg-card px-3 py-1.5 hover:border-primary hover:text-primary">{q}</button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <MessageList messages={messages} mine="CUSTOMER" />
-            )}
           </div>
-
-          {error && <p className="mx-3 mb-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-xl p-2">{error}</p>}
-
-          <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="p-3 border-t bg-card flex items-end gap-2">
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(draft); } }}
-              rows={1}
-              maxLength={2000}
-              placeholder="Type a message..."
-              className="flex-1 resize-none max-h-28 rounded-2xl border border-input bg-background px-3 py-2.5 text-sm"
-            />
-            <button type="submit" disabled={sending || !draft.trim()} aria-label="Send"
-              className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 flex-shrink-0">
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </button>
-          </form>
-          <p className="text-[10px] text-center text-foreground/45 pb-2 bg-card">
-            Chats are deleted after 30 days of inactivity. <Link href="/terms#chat" className="underline">Terms & privacy</Link>
-          </p>
         </div>
       )}
     </>

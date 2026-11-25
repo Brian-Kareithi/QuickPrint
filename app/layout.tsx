@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import { SiteFooter } from '@/components/site-footer';
 import { ThemeSync } from '@/components/theme-sync';
+import { Toaster } from '@/components/toaster';
 import { THEME_INIT_SCRIPT } from '@/lib/portal-theme';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeSync />
           {children}
           <SiteFooter />
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

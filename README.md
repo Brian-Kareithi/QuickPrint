@@ -9,7 +9,7 @@ Built with Next.js 16, React 19, and Tailwind CSS 4. Customers can also use the
 
 ## Screenshots
 
-**Customer upload portal** (`/shop/[slug]`). The chat button sits at the bottom right.
+**Customer upload portal** (`/shop/[slug]`). The chat button sits at the bottom right and opens the chat as a popup.
 
 <img src="docs/screenshots/shop.png" alt="Customer shop portal" width="800">
 
@@ -38,6 +38,9 @@ Built with Next.js 16, React 19, and Tailwind CSS 4. Customers can also use the
 - Customer ↔ shop chat: customers chat as guests with a fun nickname (for example *Cute Pineapple 🍍*); owners and cashiers reply from a live inbox with unread badges
 - Terms & Privacy page covering data collection, retention and rights under the Kenya Data Protection Act 2019
 - Flat dark mode for the signed-in portal (no gradients or glows)
+- Live message alerts: a dashboard-wide listener shows a toast with each new customer message (click to open the chat), refreshes the Messages badge instantly, and can send desktop notifications when the tab is in the background
+- Unread count in the browser tab: `(3) QuickPrint` plus a red badge on the tab icon (owners: unread chats + notifications; customers: unread shop replies)
+- Customer chat opens as a popup with a floating header and composer; light "liquid glass" surfaces, subtle animations and loading skeletons that mirror each page's layout
 
 ## Quick start
 
@@ -88,7 +91,7 @@ In production, configure `NEXT_PUBLIC_APP_URL` to the deployed public address be
 |-------|-------------|
 | `/dashboard` | Shop overview and onboarding checklist |
 | `/dashboard/orders` | Search and manage orders, including payment status |
-| `/dashboard/messages` | Customer chats inbox (`?c=<id>` opens a specific chat) |
+| `/dashboard/messages` | Customer chats inbox (`?c=<id>` opens a specific chat; offers to turn on desktop alerts) |
 | `/dashboard/queue` | Print queue and job status updates |
 | `/dashboard/analytics` | Revenue, order, peak-hour, and utilization charts |
 | `/dashboard/payments` | Configure customer payment instructions |

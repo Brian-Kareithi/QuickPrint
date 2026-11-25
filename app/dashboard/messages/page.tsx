@@ -9,7 +9,7 @@ import { ErrorState } from '@/components/error-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MessageList } from '@/components/chat/message-list';
-import { aliasColor, chatSocket, mergeMessages, SHOP_QUICK_REPLIES, type ChatMessage } from '@/lib/chat';
+import { aliasColor, chatPresence, chatSocket, mergeMessages, SHOP_QUICK_REPLIES, type ChatMessage } from '@/lib/chat';
 import { formatCurrency, formatTime, formatDate, getStatusColor } from '@/lib/utils';
 
 type Conversation = {
@@ -55,8 +55,19 @@ function MessagesInbox() {
   const [threadLoading, setThreadLoading] = useState(false);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  // Desktop notifications need the browser's permission; offer a button until it's been answered.
+  const [alertsAsk, setAlertsAsk] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAlertsAsk(typeof Notification !== 'undefined' && Notification.permission === 'default'), 0);
+    return () => clearTimeout(t);
+  }, []);
+  const enableAlerts = () => Notification.requestPermission().finally(() => setAlertsAsk(false));
   const activeRef = useRef<string | null>(null);
-  useEffect(() => { activeRef.current = activeId; }, [activeId]);
+  useEffect(() => {
+    activeRef.current = activeId;
+    chatPresence.conversationId = activeId; // the global listener won't toast this conversation
+    return () => { chatPresence.conversationId = null; };
+  }, [activeId]);
 
   const loadList = useCallback((id: string) => {
     return api.chat.list(id).then(setConversations).catch((e) => setError(e.message));
@@ -162,6 +173,11 @@ function MessagesInbox() {
             {unreadTotal > 0 && <span key={unreadTotal} className="anim-badge text-[11px] font-semibold rounded-full bg-primary text-primary-foreground px-2 py-0.5">{unreadTotal} new</span>}
           </div>
           <p className="text-xs text-foreground/55 mt-0.5">Customers get a fun nickname so you can tell them apart.</p>
+          {alertsAsk && (
+            <button onClick={enableAlerts} className="anim-fade-up mt-2 w-full text-xs rounded-2xl bg-primary/10 text-primary px-3 py-2 text-left hover:bg-primary/15">
+              🔔 Turn on desktop alerts for new messages
+            </button>
+          )}
           <div className="flex gap-1.5 mt-3">
             {([['OPEN', 'Open'], ['CLOSED', 'Resolved'], ['', 'All']] as const).map(([v, l]) => (
               <button key={l} onClick={() => setFilter(v)}
@@ -198,8 +214,8 @@ function MessagesInbox() {
         </ul>
       </section>
 
-      {/* Thread */}
-      <section className={`${activeId ? 'flex' : 'hidden md:flex'} flex-1 min-w-0 flex-col bg-card rounded-3xl border overflow-hidden`}>
+      {/* Thread: messages scroll underneath a floating glass header and a floating composer. */}
+      <section className={`${activeId ? 'flex' : 'hidden md:flex'} relative flex-1 min-w-0 flex-col bg-card rounded-3xl border overflow-hidden`}>
         {!active ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-foreground/55">
             <MessageCircle className="h-10 w-10 mb-2 text-foreground/25" />
@@ -207,51 +223,52 @@ function MessagesInbox() {
           </div>
         ) : (
           <>
-            <header className="flex items-center gap-3 px-4 py-3 border-b">
-              <button onClick={() => setActiveId(null)} className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted" aria-label="Back"><ArrowLeft className="h-4 w-4" /></button>
-              <Avatar c={active} size="h-9 w-9" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate">{active.alias}</p>
-                <p className="text-[11px] text-foreground/55 truncate">
-                  {active.customerName ? `Gave name: ${active.customerName}` : 'Guest customer'}{active.orderNumber ? ` · ${active.orderNumber}` : ''}
-                </p>
-              </div>
-              <Button size="sm" variant="outline" onClick={toggleStatus}>
-                {active.status === 'OPEN' ? <><CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Resolve</> : <><RotateCcw className="h-3.5 w-3.5 mr-1" /> Reopen</>}
-              </Button>
-            </header>
-
-            {order && (
-              <div className="mx-4 mt-3 rounded-2xl bg-muted/60 border p-3 text-xs flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span className="font-semibold">{order.orderNumber}</span>
-                <Badge className={getStatusColor(order.status)}>{order.status.replace(/_/g, ' ')}</Badge>
-                <span>{formatCurrency(order.totalAmount)} · {order.isPaid ? 'Paid' : 'Unpaid'}</span>
-                <span className="text-foreground/55 truncate">{order.items.map((i: any) => i.fileName).join(', ')}</span>
-              </div>
-            )}
-
-            <div className="flex-1 min-h-0 overflow-y-auto p-4">
-              {threadLoading ? <ChatBubblesSkeleton />
-                : <MessageList messages={messages} mine="SHOP" />}
+            <div className={`absolute inset-0 overflow-y-auto overscroll-contain px-3 sm:px-4 pb-40 ${order ? 'pt-40 sm:pt-36' : 'pt-24'}`}>
+              {threadLoading ? <ChatBubblesSkeleton /> : <MessageList messages={messages} mine="SHOP" />}
             </div>
 
-            {error && <p className="mx-4 mb-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-xl p-2">{error}</p>}
-
-            <div className="px-4 pt-2 flex gap-1.5 overflow-x-auto">
-              {SHOP_QUICK_REPLIES.map((q) => (
-                <button key={q} onClick={() => setDraft(q)} className="text-[11px] whitespace-nowrap rounded-full border px-2.5 py-1 hover:border-primary hover:text-primary">{q}</button>
-              ))}
+            <div className="absolute top-3 inset-x-3 z-10 space-y-2">
+              <header className="glass rounded-3xl flex items-center gap-3 pl-2 pr-2 py-2">
+                <button onClick={() => setActiveId(null)} className="md:hidden h-9 w-9 rounded-full hover:bg-muted flex items-center justify-center" aria-label="Back"><ArrowLeft className="h-4 w-4" /></button>
+                <Avatar c={active} size="h-10 w-10" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold truncate">{active.alias}</p>
+                  <p className="text-[11px] text-foreground/55 truncate">
+                    {active.customerName ? `Gave name: ${active.customerName}` : 'Guest customer'}{active.orderNumber ? ` · ${active.orderNumber}` : ''}
+                  </p>
+                </div>
+                <Button size="sm" variant="outline" onClick={toggleStatus} className="rounded-full bg-transparent">
+                  {active.status === 'OPEN' ? <><CheckCircle2 className="h-3.5 w-3.5 sm:mr-1" /><span className="hidden sm:inline">Resolve</span></> : <><RotateCcw className="h-3.5 w-3.5 sm:mr-1" /><span className="hidden sm:inline">Reopen</span></>}
+                </Button>
+              </header>
+              {order && (
+                <div className="glass anim-fade-up rounded-2xl px-3 py-2 text-xs flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="font-semibold">{order.orderNumber}</span>
+                  <Badge className={getStatusColor(order.status)}>{order.status.replace(/_/g, ' ')}</Badge>
+                  <span>{formatCurrency(order.totalAmount)} · {order.isPaid ? 'Paid' : 'Unpaid'}</span>
+                  <span className="text-foreground/55 truncate max-w-full">{order.items.map((i: any) => i.fileName).join(', ')}</span>
+                </div>
+              )}
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="p-3 flex items-end gap-2">
-              <textarea value={draft} onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(draft); } }}
-                rows={1} maxLength={2000} placeholder={`Reply to ${active.alias}...`}
-                className="flex-1 resize-none max-h-32 rounded-2xl border border-input bg-background px-3 py-2.5 text-sm" />
-              <button type="submit" disabled={sending || !draft.trim()} aria-label="Send"
-                className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 flex-shrink-0">
-                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </button>
-            </form>
+
+            <div className="absolute bottom-3 inset-x-3 z-10 space-y-2">
+              {error && <p className="anim-pop text-xs text-red-700 bg-red-50 border border-red-100 rounded-2xl p-2">{error}</p>}
+              <div className="flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none]">
+                {SHOP_QUICK_REPLIES.map((q) => (
+                  <button key={q} onClick={() => setDraft(q)} className="glass text-[11px] whitespace-nowrap rounded-full px-3 py-1.5 hover:text-primary">{q}</button>
+                ))}
+              </div>
+              <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="glass rounded-[1.75rem] flex items-end gap-2 p-1.5 pl-4">
+                <textarea value={draft} onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(draft); } }}
+                  rows={1} maxLength={2000} placeholder={`Reply to ${active.alias}…`} aria-label="Reply"
+                  className="flex-1 resize-none max-h-32 bg-transparent border-0 py-2.5 text-sm focus:!shadow-none" />
+                <button type="submit" disabled={sending || !draft.trim()} aria-label="Send"
+                  className="h-11 w-11 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 flex-shrink-0 transition-transform active:scale-95">
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </button>
+              </form>
+            </div>
           </>
         )}
       </section>
