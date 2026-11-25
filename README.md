@@ -4,7 +4,28 @@
 print shops, universities, and libraries manage incoming print jobs from upload through
 pickup.
 
-Built with Next.js 16, React 19, and Tailwind CSS 4.
+Built with Next.js 16, React 19, and Tailwind CSS 4. Customers can also use the
+[QuickPrint Android app](https://github.com/Brian-Kareithi/QuickPrint-Android), which talks to the same backend.
+
+## Screenshots
+
+**Customer upload portal** (`/shop/[slug]`). The chat button sits at the bottom right.
+
+<img src="docs/screenshots/shop.png" alt="Customer shop portal" width="800">
+
+**Customer chats** (`/dashboard/messages`). Each customer gets a fruity nickname, and linked orders show above the conversation.
+
+| Light | Dark (flat, no gradients) |
+|:---:|:---:|
+| <img src="docs/screenshots/inbox-light.png" alt="Messages inbox, light" width="420"> | <img src="docs/screenshots/inbox-dark.png" alt="Messages inbox, dark" width="420"> |
+
+**The same chat from the customer's Android phone**
+
+<img src="docs/screenshots/android-chat.png" alt="Android chat, light" width="200"> <img src="docs/screenshots/android-chat-dark.png" alt="Android chat, dark" width="200">
+
+**Terms & Privacy** (`/terms`)
+
+<img src="docs/screenshots/terms.png" alt="Terms and privacy page" width="640">
 
 ## Features
 
@@ -14,6 +35,9 @@ Built with Next.js 16, React 19, and Tailwind CSS 4.
 - Shop QR codes, downloadable artwork, and printable posters
 - Dashboard analytics for revenue, orders, peak hours, and printer utilization
 - Shop settings, team access, branding, and platform administration
+- Customer ↔ shop chat: customers chat as guests with a fun nickname (for example *Cute Pineapple 🍍*); owners and cashiers reply from a live inbox with unread badges
+- Terms & Privacy page covering data collection, retention and rights under the Kenya Data Protection Act 2019
+- Flat dark mode for the signed-in portal (no gradients or glows)
 
 ## Quick start
 
@@ -54,7 +78,8 @@ In production, configure `NEXT_PUBLIC_APP_URL` to the deployed public address be
 | `/` | Product landing page |
 | `/auth/login` | Sign in |
 | `/auth/register` | Create an account |
-| `/shop/[slug]` | Shop-branded customer upload and ordering portal |
+| `/shop/[slug]` | Shop-branded customer upload and ordering portal, with a chat button |
+| `/terms` | Terms & Privacy Policy (linked from the site footer and the Android app) |
 | `/my-orders` | Customer order history |
 
 ### Shop dashboard
@@ -63,6 +88,7 @@ In production, configure `NEXT_PUBLIC_APP_URL` to the deployed public address be
 |-------|-------------|
 | `/dashboard` | Shop overview and onboarding checklist |
 | `/dashboard/orders` | Search and manage orders, including payment status |
+| `/dashboard/messages` | Customer chats inbox (`?c=<id>` opens a specific chat) |
 | `/dashboard/queue` | Print queue and job status updates |
 | `/dashboard/analytics` | Revenue, order, peak-hour, and utilization charts |
 | `/dashboard/payments` | Configure customer payment instructions |

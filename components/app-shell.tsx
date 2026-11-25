@@ -49,7 +49,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
       {open && <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden" onClick={() => setOpen(false)} />}
 
       <aside
-        className={`fixed z-50 top-3 bottom-3 left-3 w-60 max-w-[85vw] rounded-3xl bg-card text-foreground shadow-[0_8px_30px_rgba(0,50,73,0.10)] flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed z-50 top-3 bottom-3 left-3 w-60 max-w-[85vw] rounded-3xl bg-card text-foreground shadow-[0_8px_30px_rgba(0,50,73,0.10)] dark:border flex flex-col transition-transform duration-300 ease-out ${
           open ? 'translate-x-0' : '-translate-x-[110%]'
         } lg:translate-x-0`}
       >
@@ -101,7 +101,7 @@ export function AppShell({ nav, title, user, roleLabel, onLogout, showNotificati
       </aside>
 
       <div className="lg:pl-[16.5rem] lg:pr-5 min-w-0 h-full flex flex-col">
-        <header className="relative z-30 flex-shrink-0 mt-3 mx-3 lg:mx-0 h-14 rounded-3xl bg-card/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,50,73,0.07)] flex items-center px-4 gap-3">
+        <header className="relative z-30 flex-shrink-0 mt-3 mx-3 lg:mx-0 h-14 rounded-3xl bg-card/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,50,73,0.07)] dark:bg-card dark:border flex items-center px-4 gap-3">
           <button onClick={() => setOpen(true)} className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-muted">
             <Menu className="h-5 w-5" />
           </button>

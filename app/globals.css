@@ -47,21 +47,24 @@
   color-scheme: light;
 }
 
+/* Dark mode: a flat, deep navy-charcoal take on the QuickPrint palette. No gradients, glows
+   or drop shadows; depth comes from three surface steps (background < card < muted) and borders.
+   The Android app uses the same values (ui/theme/Color.kt). */
 .dark {
 
-  --background: #000000;
-  --foreground: #eef3f5;
-  --card: #0a0d0f;
-  --muted: #13181b;
-  --muted-foreground: #8f9fa7;
-  --accent: #1b2327;
-  --border: #20282d;
-  --input: #2d373d;
-  --primary: #38b9e3;
-  --primary-foreground: #04222d;
-  --secondary: #1b2327;
-  --ink: #0a7aa1;
-  --panel: #06222e;
+  --background: #0b1216;
+  --foreground: #e7eef1;
+  --card: #121c21;
+  --muted: #1a262c;
+  --muted-foreground: #8fa4ae;
+  --accent: #1f2e35;
+  --border: #22323a;
+  --input: #2e424c;
+  --primary: #4fc0e6;
+  --primary-foreground: #052430;
+  --secondary: #1a262c;
+  --ink: #13506a;
+  --panel: #0f2733;
   color-scheme: dark;
 
   --color-red-50: #3a1a1e; --color-red-100: #4a2227; --color-red-600: #f87171; --color-red-700: #fca5a5;
@@ -159,3 +162,9 @@ button:not(:disabled):active { transform: scale(0.98); }
 @media (max-height: 640px) {
   .auth-sub, .auth-logo { display: none; }
 }
+
+/* Flat dark mode: hide decorative glows and drop shadows (focus rings are kept). */
+.dark .blur-3xl, .dark .blur-2xl { display: none; }
+.dark [class*="shadow"] { --tw-shadow: 0 0 #0000 !important; }
+.dark .backdrop-blur-xl, .dark .backdrop-blur-md, .dark .backdrop-blur-sm { backdrop-filter: none; }
+.dark ::selection { background-color: #13506a; color: #e7eef1; }

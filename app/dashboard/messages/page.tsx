@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Loader2, MessageCircle, RotateCcw, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 import { ListSkeleton } from '@/components/skeleton';
@@ -37,7 +38,12 @@ function Avatar({ c, size = 'h-10 w-10' }: { c: Conversation; size?: string }) {
   );
 }
 
+// useSearchParams needs a Suspense boundary for static rendering.
 export default function MessagesPage() {
+  return <Suspense fallback={<ListSkeleton />}><MessagesInbox /></Suspense>;
+}
+
+function MessagesInbox() {
   const [shopId, setShopId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,6 +89,12 @@ export default function MessagesPage() {
       setThreadLoading(false);
     }
   }, []);
+
+  // Open a specific chat from a link, e.g. /dashboard/messages?c=<conversationId>.
+  const linkedId = useSearchParams().get('c');
+  useEffect(() => {
+    if (shopId && linkedId) openThread(linkedId);
+  }, [shopId, linkedId, openThread]);
 
   // Live updates for the whole shop inbox.
   useEffect(() => {
